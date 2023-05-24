@@ -165,7 +165,7 @@ class LenslessApp(QtWidgets.QMainWindow, LenslessLite.Ui_MainWindow):
         # cv2.imwrite(os.path.join(filepath , '{}.tiff'.format(((self.color), time.strftime("%Y%m%d-%H%M%S")))), img)
         # path = r"C:\Users\Student\Desktop\Adyasha\LenslessViewer\Image-Processing-GUI\images"
         # print(path)
-        cv2.imwrite(os.path.join(dirname,r"hi.jpg"),img)
+        cv2.imwrite(os.path.join(dirname,r'{}.tiff'.format(((self.color), time.strftime("%Y%m%d-%H%M%S")))),img)
         
 
     def startRecord(self):
