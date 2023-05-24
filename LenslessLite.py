@@ -10,6 +10,7 @@
 from main import process
 from NewGUI import Ui_new_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
+import imagej_linking
 
 
 class Ui_MainWindow(object):
@@ -135,6 +136,9 @@ class Ui_MainWindow(object):
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(750, 390, 93, 28))
         self.pushButton.setObjectName("pushButton")
+
+        self.pushButton.clicked.connect(self.OpenClick)
+
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(870, 390, 93, 28))
         self.pushButton_2.setObjectName("pushButton_2")
@@ -162,6 +166,8 @@ class Ui_MainWindow(object):
         #     process(self,MainWindow)
 
         # self.pushButton_2.clicked.connect(action)
+    def OpenClick(self):
+        imagej_linking.open_ImageJ()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
