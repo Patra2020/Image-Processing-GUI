@@ -1,3 +1,3 @@
-def process(self, MainWindow):
+def process(self,MainWindow):
     print("Hello World")
-    self.MainWindow()
+    self.NewGUI()

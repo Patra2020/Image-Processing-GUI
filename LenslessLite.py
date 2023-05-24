@@ -13,11 +13,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
-    def NewGUI(self):
-        self.Window2 = QtWidgets.QMainWindow()
-        ui = Ui_new_MainWindow()
-        ui.setupUi(self.Window2)
-        self.Window2.show()
+    def openWindow(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_new_MainWindow()
+        self.ui.setupUi(self.window)
+        # MainWindow.hide()
+        self.window.show()
+
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
@@ -135,6 +138,9 @@ class Ui_MainWindow(object):
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(870, 390, 93, 28))
         self.pushButton_2.setObjectName("pushButton_2")
+
+        self.pushButton_2.clicked.connect(self.openWindow)
+
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
         self.label_8.setGeometry(QtCore.QRect(770, 350, 181, 20))
         font = QtGui.QFont()
@@ -151,11 +157,11 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        def action(self):
-            # print("Working")
-            process(self, MainWindow)
+        # def action(self):
+        #     # print("Working")
+        #     process(self,MainWindow)
 
-        self.pushButton_2.clicked.connect(action)
+        # self.pushButton_2.clicked.connect(action)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

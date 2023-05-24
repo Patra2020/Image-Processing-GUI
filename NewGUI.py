@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'NewGUI.ui'
+# Form implementation generated from reading ui file '.\NewGUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -12,10 +12,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_new_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+    def setupUi(self, new_MainWindow):
+        new_MainWindow.setObjectName("new_MainWindow")
+        new_MainWindow.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(new_MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(280, 10, 221, 16))
@@ -61,41 +61,41 @@ class Ui_new_MainWindow(object):
         self.pushButton_12 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_12.setGeometry(QtCore.QRect(490, 260, 93, 28))
         self.pushButton_12.setObjectName("pushButton_12")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        new_MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(new_MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        new_MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(new_MainWindow)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        new_MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi(new_MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(new_MainWindow)
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, new_MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label.setText(_translate("MainWindow", "ADVANCED OPERATIONS"))
-        self.pushButton_2.setText(_translate("MainWindow", "4"))
-        self.pushButton_3.setText(_translate("MainWindow", "5"))
-        self.pushButton_4.setText(_translate("MainWindow", "8"))
-        self.pushButton_5.setText(_translate("MainWindow", "0"))
-        self.pushButton.setText(_translate("MainWindow", "B1"))
-        self.pushButton_6.setText(_translate("MainWindow", "PushButton2"))
-        self.pushButton_7.setText(_translate("MainWindow", "3"))
-        self.pushButton_8.setText(_translate("MainWindow", "6"))
-        self.pushButton_9.setText(_translate("MainWindow", "7"))
-        self.pushButton_10.setText(_translate("MainWindow", "9"))
-        self.pushButton_11.setText(_translate("MainWindow", "ON"))
-        self.pushButton_12.setText(_translate("MainWindow", "OFF"))
+        new_MainWindow.setWindowTitle(_translate("new_MainWindow", "MainWindow"))
+        self.label.setText(_translate("new_MainWindow", "ADVANCED OPERATIONS"))
+        self.pushButton_2.setText(_translate("new_MainWindow", "4"))
+        self.pushButton_3.setText(_translate("new_MainWindow", "5"))
+        self.pushButton_4.setText(_translate("new_MainWindow", "8"))
+        self.pushButton_5.setText(_translate("new_MainWindow", "0"))
+        self.pushButton.setText(_translate("new_MainWindow", "B1"))
+        self.pushButton_6.setText(_translate("new_MainWindow", "PushButton2"))
+        self.pushButton_7.setText(_translate("new_MainWindow", "3"))
+        self.pushButton_8.setText(_translate("new_MainWindow", "6"))
+        self.pushButton_9.setText(_translate("new_MainWindow", "7"))
+        self.pushButton_10.setText(_translate("new_MainWindow", "9"))
+        self.pushButton_11.setText(_translate("new_MainWindow", "ON"))
+        self.pushButton_12.setText(_translate("new_MainWindow", "OFF"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
+    new_MainWindow = QtWidgets.QMainWindow()
     ui = Ui_new_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    ui.setupUi(new_MainWindow)
+    new_MainWindow.show()
     sys.exit(app.exec_())
