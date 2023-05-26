@@ -151,21 +151,14 @@ class LenslessApp(QtWidgets.QMainWindow, LenslessLite.Ui_MainWindow):
         self.btnStartRec.setEnabled(False)
 
     def savepic(self):
+        
         frame = q.get()
         img = frame["img"]
-        
-        
-        # cv2.imwrite(('{}.tiff'.format(((self.color), time.strftime("%Y%m%d-%H%M%S")))), img)
-        # from pathlib import Path
-
-        import os
         dirname = os.path.join(os.path.dirname(__file__),r"images")
-        print(dirname)
-        # filepath = os.path.join(dirname, 'images')
-        # cv2.imwrite(os.path.join(filepath , '{}.tiff'.format(((self.color), time.strftime("%Y%m%d-%H%M%S")))), img)
-        # path = r"C:\Users\Student\Desktop\Adyasha\LenslessViewer\Image-Processing-GUI\images"
-        # print(path)
-        cv2.imwrite(os.path.join(dirname,r'{}.tiff'.format(((self.color), time.strftime("%Y%m%d-%H%M%S")))),img)
+        img_name = os.path.join(dirname,r'{}.tiff'.format(((self.color), time.strftime("%Y%m%d-%H%M%S"))))
+
+        cv2.imwrite(img_name,img)
+        
         
 
     def startRecord(self):
@@ -260,6 +253,6 @@ if __name__ == '__main__':
 
 
 
-'''copyright: Agus Budi Dharmawan - IHT, TU Braunschweig'''
+'''copyright: Agus Budi Dharmawan, Adyasha Patra, Umang Agarwal - IHT, TU Braunschweig'''
 
 

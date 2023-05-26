@@ -135,13 +135,15 @@ class Ui_MainWindow(object):
         self.label_7.setObjectName("label_7")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(750, 390, 93, 28))
-        self.pushButton.setObjectName("pushButton")
+        self.pushButton.setObjectName("pushButton")#ImageJ
 
         self.pushButton.clicked.connect(self.OpenClick)
 
+       
+
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(870, 390, 93, 28))
-        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.setObjectName("pushButton_2")#Advanced
 
         self.pushButton_2.clicked.connect(self.openWindow)
 

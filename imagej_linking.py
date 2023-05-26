@@ -1,13 +1,8 @@
 
 
 def open_ImageJ():
-    import subprocess, os, platform
+    import subprocess, os, platform, glob
     filepath = "ImageJ\ImageJ.exe"
-    # if platform.system() == 'Darwin':       # macOS
-    #     subprocess.call(('open', filepath))
-    # elif platform.system() == 'Windows':    # Windows
-    #     os.startfile(filepath)
-    # else:                                   # linux variants
-    #     subprocess.call(('xdg-open', filepath))
-    subprocess.Popen([filepath,"hi.jpg"])
+    list_of_images = glob.glob("images/*.tiff")
+    subprocess.Popen([filepath,list_of_images[len(list_of_images) - 1]])
 
