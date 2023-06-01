@@ -5,6 +5,9 @@ from PyQt5.QtWidgets import QLabel, QSizePolicy, QScrollArea, QMessageBox, QMain
     qApp, QFileDialog
 import cv2
 
+import numpy as np
+# from PyQt5.QtGui import QImage
+
 
 class QImageViewer(QMainWindow):
     
@@ -41,6 +44,7 @@ class QImageViewer(QMainWindow):
         self.printAct.setEnabled(True)
         self.fitToWindowAct.setEnabled(True)
         self.negative_action.setEnabled(True)
+        self.cannyedgeAct.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -50,7 +54,7 @@ class QImageViewer(QMainWindow):
         # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
         global fileName
         fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
-                                                  'Images (*.png *.jpeg *.jpg *.bmp *.gif)', options=options)
+                                                  'Images (*.png *.jpeg *.jpg *.bmp *.gif *.tiff)', options=options)
         if fileName:
             image = QImage(fileName)
             if image.isNull():
@@ -99,15 +103,22 @@ class QImageViewer(QMainWindow):
             self.normalSize()
 
         self.updateActions()
+    def cannyedge(self):
+        self.cannyedgeAct.isChecked()
+        img = cv2.imread(temp2)
+        kernel2 = np.ones((8,8), np.float32)/25
+        sharpen = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2)
+        img = cv2.Canny(sharpen,80,85)
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img)
+        img = QImage(temp2)
+        self.common(img)
+
 
     def negative(self):
         negative = self.negative_action.isChecked()
-        import cv2
-        import numpy as np
-        from PyQt5.QtGui import QImage
-
         # # Convert numpy array to OpenCV image
-        img = cv2.imread(fileName)
+        img = cv2.imread(temp2)
         img = abs(255-img)
         height,width,_ = img.shape
         # global temp1,temp2
@@ -145,6 +156,7 @@ class QImageViewer(QMainWindow):
                                       triggered=self.fitToWindow)
         ########################################################################################################
         self.negative_action = QAction("&Negative", self, enabled=False, triggered=self.negative)
+        self.cannyedgeAct = QAction("&cannyedge", self, enabled=False, triggered=self.cannyedge)
         self.undoAct = QAction("&Undo...", self, shortcut="Ctrl+Z", triggered=self.undo)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
