@@ -45,6 +45,7 @@ class QImageViewer(QMainWindow):
         self.fitToWindowAct.setEnabled(True)
         self.negative_action.setEnabled(True)
         self.cannyedgeAct.setEnabled(True)
+        self.normalizeAct.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -127,7 +128,16 @@ class QImageViewer(QMainWindow):
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
         self.common(img)
-              
+
+    def normalize(self):
+        img = cv2.imread(temp2)
+        #img = cv2.normalize(img, None, 0, 1.0,cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX)
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img)
+        img = QImage(temp2)
+        self.common(img)
+
 
     def about(self):
         QMessageBox.about(self, "About Image Viewer",
@@ -158,6 +168,7 @@ class QImageViewer(QMainWindow):
         self.negative_action = QAction("&Negative", self, enabled=False, triggered=self.negative)
         self.cannyedgeAct = QAction("&cannyedge", self, enabled=False, triggered=self.cannyedge)
         self.undoAct = QAction("&Undo...", self, shortcut="Ctrl+Z", triggered=self.undo)
+        self.normalizeAct = QAction("&Normalize", self, enabled=False, triggered=self.normalize)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
         self.aboutQtAct = QAction("About &Qt", self, triggered=qApp.aboutQt)
@@ -181,6 +192,7 @@ class QImageViewer(QMainWindow):
         self.editMenu = QMenu("&Edit", self)
         self.editMenu.addAction(self.negative_action)
         self.editMenu.addAction(self.cannyedgeAct)
+        self.editMenu.addAction(self.normalizeAct)
 
         self.editMenu.addSeparator()
         # self.viewMenu.addSeparator()
