@@ -145,7 +145,7 @@ class Ui_MainWindow(object):
         self.pushButton_2.setGeometry(QtCore.QRect(870, 390, 93, 28))
         self.pushButton_2.setObjectName("pushButton_2")#Advanced
 
-        self.pushButton_2.clicked.connect(self.openWindow)
+        self.pushButton_2.clicked.connect(self.Advanced_window)
 
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
         self.label_8.setGeometry(QtCore.QRect(770, 350, 181, 20))
@@ -170,6 +170,10 @@ class Ui_MainWindow(object):
         # self.pushButton_2.clicked.connect(action)
     def OpenClick(self):
         imagej_linking.open_ImageJ()
+    
+    def Advanced_window(self):
+        from subprocess import call
+        call(["python", "latest.py"])
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

@@ -12,11 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_new_MainWindow(object):
-    # def __init__(self):
-    #     super(UI,self).__init__()
-
-
-
+    
     def setupUi(self, new_MainWindow):
         new_MainWindow.setObjectName("new_MainWindow")
         new_MainWindow.resize(800, 444)
