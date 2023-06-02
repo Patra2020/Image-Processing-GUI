@@ -46,6 +46,8 @@ class QImageViewer(QMainWindow):
         self.negative_action.setEnabled(True)
         self.cannyedgeAct.setEnabled(True)
         self.normalizeAct.setEnabled(True)
+        self.sobeledgeAct.setEnabled(True)
+        self.prewittedgeAct.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -114,6 +116,45 @@ class QImageViewer(QMainWindow):
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
         self.common(img)
+        '''
+        img = cv2.imread(temp2)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #img_gaussian = cv2.GaussianBlur(gray,(3,3),0)
+        img_canny = cv2.Canny(img,100,200)
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img_canny)
+        img = QImage(temp2)
+        self.common(img)'''
+
+    
+    def sobeledge(self):
+        img = cv2.imread(temp2)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_gaussian = cv2.GaussianBlur(gray,(3,3),0)
+        img_sobelx = cv2.Sobel(img_gaussian,cv2.CV_8U,1,0,ksize=5)
+        img_sobely = cv2.Sobel(img_gaussian,cv2.CV_8U,0,1,ksize=5)
+        img_sobel = img_sobelx + img_sobely
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img_sobel)
+        img = QImage(temp2)
+        self.common(img)
+
+
+    def prewittedge(self):
+        img = cv2.imread(temp2)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_gaussian = cv2.GaussianBlur(gray,(3,3),0)
+        kernelx = np.array([[1,1,1],[0,0,0],[-1,-1,-1]])
+        kernely = np.array([[-1,0,1],[-1,0,1],[-1,0,1]])
+        img_prewittx = cv2.filter2D(img_gaussian, -1, kernelx)
+        img_prewitty = cv2.filter2D(img_gaussian, -1, kernely)
+        img_prewitt = img_prewittx + img_prewitty
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2, img_prewitt)
+        img = QImage(temp2)
+        self.common(img)
+
+
 
 
     def negative(self):
@@ -166,9 +207,11 @@ class QImageViewer(QMainWindow):
                                       triggered=self.fitToWindow)
         ########################################################################################################
         self.negative_action = QAction("&Negative", self, enabled=False, triggered=self.negative)
-        self.cannyedgeAct = QAction("&cannyedge", self, enabled=False, triggered=self.cannyedge)
+        self.cannyedgeAct = QAction("&CannyEdge", self, enabled=False, triggered=self.cannyedge)
         self.undoAct = QAction("&Undo...", self, shortcut="Ctrl+Z", triggered=self.undo)
         self.normalizeAct = QAction("&Normalize", self, enabled=False, triggered=self.normalize)
+        self.sobeledgeAct = QAction("&SobelEdge", self, enabled=False, triggered=self.sobeledge)
+        self.prewittedgeAct = QAction("&PrewittEdge", self, enabled=False, triggered=self.prewittedge)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
         self.aboutQtAct = QAction("About &Qt", self, triggered=qApp.aboutQt)
@@ -192,8 +235,9 @@ class QImageViewer(QMainWindow):
         self.editMenu = QMenu("&Edit", self)
         self.editMenu.addAction(self.negative_action)
         self.editMenu.addAction(self.cannyedgeAct)
+        self.editMenu.addAction(self.sobeledgeAct)
+        self.editMenu.addAction(self.prewittedgeAct)
         self.editMenu.addAction(self.normalizeAct)
-
         self.editMenu.addSeparator()
         # self.viewMenu.addSeparator()
         # self.viewMenu.addAction(self.sharpen)
