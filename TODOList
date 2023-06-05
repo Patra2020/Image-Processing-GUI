@@ -1,0 +1,28 @@
+
+-Smoothing (with level/slide bar) using a convolution kernel?
+
+-Sharpening (with level/slide bar) using a convolution kernel?
+
+-Ruler (users can draw a line but they have to give the scale information => 1 pixel equal to ... micrometer)
+
+-Zoom (using interpolation upsampling, but the picture is also able to be shifted)
+DONE -- Later
+
+-Angle measurement (draw a line and the compare it to the horizontal/vertical axis to get the angle value)
+
+-Edge detection (canny, perewitt, Sobel)
+DONE
+
+-Negative image
+DONE
+-Image normalization
+DONE -- thik karna hai
+-High pass filter (Fourier)
+DONE
+-Low pass filter (Fourier)
+DONE
+-Multi object segmentation (via template matching) can also be used for cell/object counting. The template can be generated trough mouse click and drag over the image
+
+-Realtime object tracking (optional but Prof. Andreas will be like to see this) for the simple approach, just used the template matching
+
+-3 empty buttons which will be used later.
