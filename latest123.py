@@ -1,14 +1,12 @@
-from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 from PyQt5.QtPrintSupport import QPrintDialog, QPrinter
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QScrollArea, QMessageBox, QMainWindow, QMenu, QAction, \
-    qApp, QFileDialog, QSlider, QRadioButton, QVBoxLayout
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QGroupBox,
-                             QMenu, QPushButton, QRadioButton, QVBoxLayout, QWidget, QSlider, QHBoxLayout)
+    qApp, QFileDialog
 import cv2
-
+#import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 # from PyQt5.QtGui import QImage
 
 
@@ -35,57 +33,9 @@ class QImageViewer(QMainWindow):
 
         self.createActions()
         self.createMenus()
-        # selfQHBoxLayout()
-        self.slider = QSlider(Qt.Orientation.Horizontal, self)
-        self.slider.setGeometry(5, 30, 200, 20)
-        self.slider.setRange(1, 5)
-        self.slider.setValue(1)
-        self.slider.valueChanged.connect(self.smoothen)
-        # self.slider.setStyleSheet()
-        # label = QLabel("SMOOTHEN", self)
- 
-        # # setting geometry to the label
-        # label.setGeometry(55,30,200,20)
- 
-        # # making label multi line
-        # label.setWordWrap(True)
 
-        
-
- 
         self.setWindowTitle("Image Viewer")
         self.resize(800, 600)
-
-    def stylesheet(self):
-        return """
-            QSlider::groove:horizontal {
-                background: white;
-                height: 40px;
-            }
-
-            # QSlider::sub-page:horizontal {
-            #     background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,
-            #         stop: 0 #66e, stop: 1 #bbf);
-            #     background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,
-            #         stop: 0 #bbf, stop: 1 #55f);
-            #     height: 40px;
-            # }
-
-            QSlider::add-page:horizontal {
-                background: #fff;
-                height: 40px;
-            }
-
-            QSlider::handle:horizontal {
-                background: #bbf;
-                border: 0px;
-                width: 0px;
-                margin-top: 0px;
-                margin-bottom: 0px;
-                border-radius: 0px;
-            }
-        """
-
 
     def common(self,img):
         self.imageLabel.setPixmap(QPixmap.fromImage(img))
@@ -97,6 +47,10 @@ class QImageViewer(QMainWindow):
         self.negative_action.setEnabled(True)
         self.cannyedgeAct.setEnabled(True)
         self.normalizeAct.setEnabled(True)
+        self.sobeledgeAct.setEnabled(True)
+        self.prewittedgeAct.setEnabled(True)
+        self.prewittedgeAct.setEnabled(True)
+        self.highpassfilterACT.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -165,6 +119,43 @@ class QImageViewer(QMainWindow):
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
         self.common(img)
+        '''
+        img = cv2.imread(temp2)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #img_gaussian = cv2.GaussianBlur(gray,(3,3),0)
+        img_canny = cv2.Canny(img,100,200)
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img_canny)
+        img = QImage(temp2)
+        self.common(img)'''
+
+    
+    def sobeledge(self):
+        img = cv2.imread(temp2)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_gaussian = cv2.GaussianBlur(gray,(3,3),0)
+        img_sobelx = cv2.Sobel(img_gaussian,cv2.CV_8U,1,0,ksize=5)
+        img_sobely = cv2.Sobel(img_gaussian,cv2.CV_8U,0,1,ksize=5)
+        img_sobel = img_sobelx + img_sobely
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img_sobel)
+        img = QImage(temp2)
+        self.common(img)
+
+
+    def prewittedge(self):
+        img = cv2.imread(temp2)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_gaussian = cv2.GaussianBlur(gray,(3,3),0)
+        kernelx = np.array([[1,1,1],[0,0,0],[-1,-1,-1]])
+        kernely = np.array([[-1,0,1],[-1,0,1],[-1,0,1]])
+        img_prewittx = cv2.filter2D(img_gaussian, -1, kernelx)
+        img_prewitty = cv2.filter2D(img_gaussian, -1, kernely)
+        img_prewitt = img_prewittx + img_prewitty
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2, img_prewitt)
+        img = QImage(temp2)
+        self.common(img)
 
 
     def negative(self):
@@ -179,71 +170,130 @@ class QImageViewer(QMainWindow):
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
         self.common(img)
-    
-    
-    
-    # def smoothen(self,value):
-    #     # temp1_pic = cv2.imread(temp2)
-    #     # temp2_pic = cv2.imread(temp2)
-    #     # temp3_pic = cv2.imread(temp2)
-    #     # temp4_pic = cv2.imread(temp2)
-    #     # temp5_pic = cv2.imread(temp2)
-        
-    #     print(value)
-    #     # kernelSizes = [(1, 1), (2, 2), (3, 3),(4,4),(5,5)]
-    #     # # loop over the kernel sizes
-    #     # for (kX, kY) in kernelSizes:
-    #     img = cv2.imread(temp2)
-    #     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    #     # kX = kY = value
-    #     kernel2_1 = np.ones((1,1), np.float32)/25
-    #     temp1_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_1)
-    #     kernel2_2 = np.ones((2,2), np.float32)/25
-    #     temp2_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_2)
-    #     kernel2_3 = np.ones((3,3), np.float32)/25
-    #     temp3_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_3)
-    #     kernel2_4 = np.ones((4,4), np.float32)/25
-    #     temp4_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_4)
-    #     kernel2_5 = np.ones((5,5), np.float32)/25
-    #     temp5_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_5)
-
-
-    #     # img = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2)
-
-    #     if(value == 1):
-    #         temp_img = temp1_pic
-    #     elif(value == 2):
-    #         temp_img = temp2_pic
-    #     elif(value == 3):
-    #         temp_img = temp3_pic
-    #     elif(value == 4):
-    #         temp_img = temp4_pic
-    #     elif(value == 5):
-    #         temp_img = temp5_pic
-    #     # cv2.imwrite(temp1,cv2.imread(temp2))
-    #     # cv2.imwrite(temp2,img)
-    #     temp_img = QImage(temp_img)
-    #     self.common(temp_img)
-
-
-
-
-
-
-
-
-
-
-
 
 
     def normalize(self):
         img = cv2.imread(temp2)
-        img_normalized = np.array((img - np.min(img)) / (np.max(img) - np.min(img)))
+        #img = cv2.normalize(img, None, 0, 1.0,cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX)
         cv2.imwrite(temp1,cv2.imread(temp2))
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
         self.common(img)
+
+    
+    def highpassfilter(self):
+        img = cv2.imread(temp2)/float(2**8)
+        shape = img.shape[:2]
+        def draw_cicle(shape,diamiter):
+            assert len(shape) == 2
+            TF = np.zeros(shape,dtype=bool)
+            center = np.array(TF.shape)/2.0
+
+            for iy in range(shape[0]):
+                for ix in range(shape[1]):
+                    TF[iy,ix] = (iy- center[0])**2 + (ix - center[1])**2 < diamiter **2
+            return(TF)
+
+
+        TFcircleIN   = draw_cicle(shape=img.shape[:2],diamiter=50)
+        TFcircleOUT  = ~TFcircleIN
+
+        fig = plt.figure(figsize=(30,10))
+        ax  = fig.add_subplot(1,2,1)
+        im  = ax.imshow(TFcircleIN,cmap="gray")
+        plt.colorbar(im)
+        ax  = fig.add_subplot(1,2,2)
+        im  = ax.imshow(TFcircleOUT,cmap="gray")
+        # plt.colorbar(im)
+        # plt.show()
+
+        fft_img = np.zeros_like(img,dtype=complex)
+        for ichannel in range(fft_img.shape[2]):
+            fft_img[:,:,ichannel] = np.fft.fftshift(np.fft.fft2(img[:,:,ichannel]))
+
+        def filter_circle(TFcircleIN,fft_img_channel):
+            temp = np.zeros(fft_img_channel.shape[:2],dtype=complex)
+            temp[TFcircleIN] = fft_img_channel[TFcircleIN]
+            return(temp)
+
+        fft_img_filtered_IN = []
+        fft_img_filtered_OUT = []
+## for each channel, pass filter
+        for ichannel in range(fft_img.shape[2]):
+            fft_img_channel  = fft_img[:,:,ichannel]
+    ## circle IN
+            temp = filter_circle(TFcircleIN,fft_img_channel)
+            fft_img_filtered_IN.append(temp)
+    ## circle OUT
+            temp = filter_circle(TFcircleOUT,fft_img_channel)
+            fft_img_filtered_OUT.append(temp) 
+    
+        fft_img_filtered_IN = np.array(fft_img_filtered_IN)
+        fft_img_filtered_IN = np.transpose(fft_img_filtered_IN,(1,2,0))
+        fft_img_filtered_OUT = np.array(fft_img_filtered_OUT)
+        fft_img_filtered_OUT = np.transpose(fft_img_filtered_OUT,(1,2,0))
+
+        abs_fft_img              = np.abs(fft_img)
+        abs_fft_img_filtered_IN  = np.abs(fft_img_filtered_IN)
+        abs_fft_img_filtered_OUT = np.abs(fft_img_filtered_OUT)
+
+
+        def imshow_fft(absfft):
+            magnitude_spectrum = 20*np.log(absfft+0.00001)
+            return(ax.imshow(magnitude_spectrum,cmap="gray"))
+
+        fig, axs = plt.subplots(nrows=3,ncols=3,figsize=(15,10))
+        fontsize = 15 
+        for ichannel, color in enumerate(["R","G","B"]):
+            ax = axs[0,ichannel]
+            ax.set_title(color)
+            im = imshow_fft(abs_fft_img[:,:,ichannel])
+            ax.axis("off")
+            if ichannel == 0:
+                ax.set_ylabel("original DFT",fontsize=fontsize)
+            fig.colorbar(im,ax=ax)
+    
+    
+            ax = axs[1,ichannel]
+            im = imshow_fft(abs_fft_img_filtered_IN[:,:,ichannel])
+            ax.axis("off")
+            if ichannel == 0:
+                ax.set_ylabel("DFT + low pass filter",fontsize=fontsize)
+                fig.colorbar(im,ax=ax)
+    
+            ax = axs[2,ichannel]
+            im = imshow_fft(abs_fft_img_filtered_OUT[:,:,ichannel])
+            ax.axis("off")
+            if ichannel == 0:
+                ax.set_ylabel("DFT + high pass filter",fontsize=fontsize)   
+            fig.colorbar(im,ax=ax)
+    
+# plt.show()
+
+
+        def inv_FFT_all_channel(fft_img):
+            img_reco = []
+            for ichannel in range(fft_img.shape[2]):
+                img_reco.append(np.fft.ifft2(np.fft.ifftshift(fft_img[:,:,ichannel])))
+            img_reco = np.array(img_reco)
+            img_reco = np.transpose(img_reco,(1,2,0))
+            return(img_reco)
+
+
+        img_reco              = inv_FFT_all_channel(fft_img)
+        img_reco_filtered_IN  = inv_FFT_all_channel(fft_img_filtered_IN)
+        img_reco_filtered_OUT = inv_FFT_all_channel(fft_img_filtered_OUT)
+        print(img_reco_filtered_OUT)
+
+        ax  = fig.add_subplot(1,3,3)
+        try123 = ax.imshow(np.abs(img_reco_filtered_OUT))
+        ax.set_title("high pass filtered image") 
+
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2, img_reco_filtered_OUT)
+        img = QImage(temp2)
+        self.common(try123)
 
 
     def about(self):
@@ -276,6 +326,9 @@ class QImageViewer(QMainWindow):
         self.cannyedgeAct = QAction("&CannyEdge", self, enabled=False, triggered=self.cannyedge)
         self.undoAct = QAction("&Undo...", self, shortcut="Ctrl+Z", triggered=self.undo)
         self.normalizeAct = QAction("&Normalize", self, enabled=False, triggered=self.normalize)
+        self.sobeledgeAct = QAction("&SobelEdge", self, enabled=False, triggered=self.sobeledge)
+        self.prewittedgeAct = QAction("&PrewittEdge", self, enabled=False, triggered=self.prewittedge)
+        self.highpassfilterACT = QAction("&HighPassFilter", self, enabled=False, triggered=self.highpassfilter)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
         self.aboutQtAct = QAction("About &Qt", self, triggered=qApp.aboutQt)
@@ -302,8 +355,8 @@ class QImageViewer(QMainWindow):
         self.editMenu.addAction(self.sobeledgeAct)
         self.editMenu.addAction(self.prewittedgeAct)
         self.editMenu.addAction(self.normalizeAct)
-
         self.editMenu.addSeparator()
+        self.editMenu.addAction(self.highpassfilterACT)
         # self.viewMenu.addSeparator()
         # self.viewMenu.addAction(self.sharpen)
         
