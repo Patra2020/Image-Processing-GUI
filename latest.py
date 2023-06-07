@@ -328,7 +328,7 @@ class QImageViewer(QMainWindow):
     def smoothen(self):
         self.smoothenAct.isChecked()
         img = cv2.imread(temp2)
-        kX = kY = 3
+        kX = kY = 5
             # apply an "average" blur to the image using the current kernel
             # size
         kernel2 = np.ones((kX,kY), np.float32)/25
@@ -344,7 +344,7 @@ class QImageViewer(QMainWindow):
     def sharpen(self):
         self.sharpenAct.isChecked()
         img = cv2.imread(temp2)
-        kX = kY = 3
+        kX = kY = 1
             # apply an "average" blur to the image using the current kernel
             # size
         kernel2 = np.ones((kX,kY), np.float32)/25
