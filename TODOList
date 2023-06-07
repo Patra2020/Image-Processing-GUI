@@ -4,12 +4,12 @@
 -Sharpening (with level/slide bar) using a convolution kernel?
 
 -Ruler (users can draw a line but they have to give the scale information => 1 pixel equal to ... micrometer)
-
+DONE
 -Zoom (using interpolation upsampling, but the picture is also able to be shifted)
-DONE -- Later
+DONE 
 
 -Angle measurement (draw a line and the compare it to the horizontal/vertical axis to get the angle value)
-
+DONE
 -Edge detection (canny, perewitt, Sobel)
 DONE
 
