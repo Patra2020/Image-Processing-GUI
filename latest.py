@@ -186,7 +186,8 @@ class QImageViewer(QMainWindow):
         self.advhighpassAct.setEnabled(True)
         self.rulerAct.setEnabled(True)
         # self.rulerclose.setEnabled(True)
-        # self.smoothenAct.setEnabled(True)
+        self.smoothenAct.setEnabled(True)
+        self.sharpenAct.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -324,6 +325,37 @@ class QImageViewer(QMainWindow):
         img = QImage(temp2)
         self.common(img)
     
+    def smoothen(self):
+        self.smoothenAct.isChecked()
+        img = cv2.imread(temp2)
+        kX = kY = 3
+            # apply an "average" blur to the image using the current kernel
+            # size
+        kernel2 = np.ones((kX,kY), np.float32)/25
+            # blurred = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2)
+            # plt.imshow(blurred,cmap = 'gray',interpolation = 'bicubic')
+        # kernel_sharp = 2*np.eye(kX) - kernel2
+        img = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2)
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img)
+        img = QImage(temp2)
+        self.common(img)
+    
+    def sharpen(self):
+        self.sharpenAct.isChecked()
+        img = cv2.imread(temp2)
+        kX = kY = 3
+            # apply an "average" blur to the image using the current kernel
+            # size
+        kernel2 = np.ones((kX,kY), np.float32)/25
+            # blurred = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2)
+            # plt.imshow(blurred,cmap = 'gray',interpolation = 'bicubic')
+        kernel_sharp = 2*np.eye(kX) - kernel2
+        img = cv2.filter2D(src=img, ddepth=-1, kernel=kernel_sharp)
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,img)
+        img = QImage(temp2)
+        self.common(img)
 
     def lowpass(self):
         self.lowpassAct.isChecked()
@@ -648,7 +680,8 @@ class QImageViewer(QMainWindow):
         self.highpassAct = QAction("&HighPassFilter", self, enabled=False, triggered=self.highpass)
         self.advhighpassAct = QAction("&AdvancedHighPassFilter", self, enabled=False, triggered=self.advhighpass)
         self.rulerAct = QAction("&Ruler", self, enabled=False, triggered=self.ruler)
-        # self.smoothenAct = QAction("&Smoothen", self, enabled=False, triggered=self.smoothen)
+        self.smoothenAct = QAction("&Smoothen", self, enabled=False, triggered=self.smoothen)
+        self.sharpenAct = QAction("&Sharpen", self, enabled=False, triggered=self.sharpen)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
         self.aboutQtAct = QAction("About &Qt", self, triggered=qApp.aboutQt)
@@ -686,7 +719,8 @@ class QImageViewer(QMainWindow):
         self.editMenu.addAction(self.highpassAct)
         self.editMenu.addAction(self.advhighpassAct)
         self.editMenu.addAction(self.rulerAct)
-        # self.editMenu.addAction(self.smoothenAct)
+        self.editMenu.addAction(self.smoothenAct)
+        self.editMenu.addAction(self.sharpenAct)
         self.editMenu.addSeparator()
         # self.viewMenu.addSeparator()
         # self.viewMenu.addAction(self.sharpen)
