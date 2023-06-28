@@ -11,6 +11,8 @@ import cv2
 import numpy as np
 from tkinter import *
 import math
+import os
+import matplotlib.pyplot as plt
 
 # from tkinter import *
 # from PyQt5.QtGui import QImage
@@ -188,6 +190,8 @@ class QImageViewer(QMainWindow):
         # self.rulerclose.setEnabled(True)
         self.smoothenAct.setEnabled(True)
         self.sharpenAct.setEnabled(True)
+        self.rotateAct.setEnabled(True)
+        self.rotatemergeAct.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -309,6 +313,201 @@ class QImageViewer(QMainWindow):
         img = QImage(temp2)
         self.common(img)
 
+
+    def rotate_merge(self):
+
+        #SELECT THE "base.bmp" file
+
+        image1 = cv2.imread(temp2)
+        gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+        directory = os.path.dirname(fileName)
+
+
+        # base_image_path = 'base.bmp'
+        # image1 = cv2.imread(base_image_path)
+        # gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+        base_image_extension = os.path.splitext(fileName)[1]
+
+        finalimages = []
+        i = 0
+
+        #directory = 'RotationExperiment'
+        for filename in os.listdir(directory):
+            f = os.path.join(directory, filename)
+            image2 = cv2.imread(f)
+            gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+            wid = image2.shape[1]
+            hgt = image2.shape[0]
+
+            # displaying the dimensions
+            #print(str(wid) + "x" + str(hgt))
+
+            sift = cv2.SIFT_create(nfeatures=100)
+            keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
+            keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
+
+            bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+            matches = bf.match(descriptors1, descriptors2)
+            matches = sorted(matches, key=lambda x: x.distance)
+
+            matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
+            matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
+
+            tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
+            sc = tform[0, 0]
+            ss = tform[0, 1]
+            scaleRecovered = np.sqrt(sc * 2 + ss * 2)
+            thetaRecovered = np.degrees(np.arctan2(-ss, sc))
+
+            print('Recovered scale:', scaleRecovered)
+            print('Recovered rotation angle:', thetaRecovered)
+
+            # Calculate the output size based on the larger image dimensions
+            outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
+
+            alignedImage = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
+
+            fig = plt.figure(figsize=(10, 7))
+            rows = 1
+            columns = 3
+
+            # plt.imshow(image2)
+            # plt.axis('off')
+            # plt.title("Second")
+            # plt.show()
+
+            # plt.imshow(alignedImage)
+            # plt.axis('off')
+            # plt.title("Final")
+            # plt.show()
+
+         
+
+            folder_path = "ROT123"  # Specify the folder path
+
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+                #print("Folder created successfully.")
+            # else:
+                #print("Folder already exists.")
+
+            aligned_image_path = f'ROT123/{i}{base_image_extension}'
+            cv2.imwrite(aligned_image_path, alignedImage)
+            i = i + 1
+            wid = alignedImage.shape[1]
+            hgt = alignedImage.shape[0]
+
+            # displaying the dimensions
+            #print(str(wid) + "x" + str(hgt))
+            finalimages.append(alignedImage)
+
+
+        directory = 'ROT123'
+        merged_image = 0
+        i = 0
+        for filename in os.listdir(directory):
+            f = os.path.join(directory, filename)
+            i = i+1
+        # for image in image_files:
+
+            image = cv2.imread(f)
+        # Convert images to floating-point format
+
+        # for image in finalimages:
+            image = image.astype(np.float32)/255.0
+            merged_image = merged_image + image
+
+        # Average the two images
+            merged_image = merged_image/i
+
+        # Convert the merged image back to the uint8 format
+            merged_image = (merged_image * 255).astype(np.uint8)
+            img = merged_image
+
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2, img)
+        img = QImage(temp2)
+        self.common(img)
+
+
+
+    def rotate(self):
+        image2 = cv2.imread(temp2)
+        gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+        wid = image2.shape[1]
+        hgt = image2.shape[0]
+        img_folder = os.path.dirname(fileName)
+        base_image_path = img_folder+'/base.bmp'
+        image1 = cv2.imread(base_image_path)
+        gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+        base_image_extension = os.path.splitext(base_image_path)[1]
+
+        # finalimages = []
+        # i = 0
+
+        # directory = 'RotationExperiment'
+        # for filename in os.listdir(directory):
+        #     f = os.path.join(directory, filename)
+        
+
+            # displaying the dimensions
+            #print(str(wid) + "x" + str(hgt))
+
+        sift = cv2.SIFT_create(nfeatures=100)
+        keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
+        keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
+
+        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+        matches = bf.match(descriptors1, descriptors2)
+        matches = sorted(matches, key=lambda x: x.distance)
+
+        matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
+        matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
+
+        tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
+        sc = tform[0, 0]
+        ss = tform[0, 1]
+        scaleRecovered = np.sqrt(sc * 2 + ss * 2)
+        thetaRecovered = np.degrees(np.arctan2(-ss, sc))
+
+        # print('Recovered scale:', scaleRecovered)
+        # print('Recovered rotation angle:', thetaRecovered)
+
+            # Calculate the output size based on the larger image dimensions
+        outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
+
+        img = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
+
+        # fig = plt.figure(figsize=(10, 7))
+        # rows = 1
+        # columns = 3
+
+        #     plt.imshow(image2)
+        #     plt.axis('off')
+        #     plt.title("Second")
+        #     plt.show()
+
+        #     plt.imshow(alignedImage)
+        #     plt.axis('off')
+        #     plt.title("Final")
+            # plt.show()
+
+        #aligned_image_path = f'ROT/{i}{base_image_extension}'
+        #cv2.imwrite(aligned_image_path, img)
+        #i = i + 1
+        wid = img.shape[1]
+        hgt = img.shape[0]
+
+            # displaying the dimensions
+        #print(str(wid) + "x" + str(hgt))
+
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2, img)
+        img = QImage(temp2)
+        self.common(img)
+
+
+        #finalimages.append(alignedImage)
 
 
 
@@ -682,6 +881,8 @@ class QImageViewer(QMainWindow):
         self.rulerAct = QAction("&Ruler", self, enabled=False, triggered=self.ruler)
         self.smoothenAct = QAction("&Smoothen", self, enabled=False, triggered=self.smoothen)
         self.sharpenAct = QAction("&Sharpen", self, enabled=False, triggered=self.sharpen)
+        self.rotateAct = QAction("&Rotate", self, enabled=False, triggered=self.rotate)
+        self.rotatemergeAct = QAction("&Rotate_Merge", self, enabled=False, triggered=self.rotate_merge)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
         self.aboutQtAct = QAction("About &Qt", self, triggered=qApp.aboutQt)
@@ -721,6 +922,8 @@ class QImageViewer(QMainWindow):
         self.editMenu.addAction(self.rulerAct)
         self.editMenu.addAction(self.smoothenAct)
         self.editMenu.addAction(self.sharpenAct)
+        self.editMenu.addAction(self.rotateAct)
+        self.editMenu.addAction(self.rotatemergeAct)
         self.editMenu.addSeparator()
         # self.viewMenu.addSeparator()
         # self.viewMenu.addAction(self.sharpen)
