@@ -418,11 +418,11 @@ class QImageViewer(QMainWindow):
             merged_image = merged_image + image
 
         # Average the two images
-            merged_image = merged_image/i
+        merged_image = merged_image/i
 
         # Convert the merged image back to the uint8 format
-            merged_image = (merged_image * 255).astype(np.uint8)
-            img = merged_image
+        merged_image = (merged_image * 255).astype(np.uint8)
+        img = merged_image
 
         cv2.imwrite(temp1,cv2.imread(temp2))
         cv2.imwrite(temp2, img)
