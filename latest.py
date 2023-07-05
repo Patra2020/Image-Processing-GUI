@@ -187,11 +187,13 @@ class QImageViewer(QMainWindow):
         self.highpassAct.setEnabled(True)
         self.advhighpassAct.setEnabled(True)
         self.rulerAct.setEnabled(True)
+        self.trackerAct.setEnabled(True)
         # self.rulerclose.setEnabled(True)
         self.smoothenAct.setEnabled(True)
         self.sharpenAct.setEnabled(True)
         self.rotateAct.setEnabled(True)
         self.rotatemergeAct.setEnabled(True)
+        self.imagesegmentAct.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -423,6 +425,8 @@ class QImageViewer(QMainWindow):
         # Convert the merged image back to the uint8 format
         merged_image = (merged_image * 255).astype(np.uint8)
         img = merged_image
+        img1 = img
+        cv2.imwrite("merged.bmp", img1) 
 
         cv2.imwrite(temp1,cv2.imread(temp2))
         cv2.imwrite(temp2, img)
@@ -441,17 +445,6 @@ class QImageViewer(QMainWindow):
         image1 = cv2.imread(base_image_path)
         gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
         base_image_extension = os.path.splitext(base_image_path)[1]
-
-        # finalimages = []
-        # i = 0
-
-        # directory = 'RotationExperiment'
-        # for filename in os.listdir(directory):
-        #     f = os.path.join(directory, filename)
-        
-
-            # displaying the dimensions
-            #print(str(wid) + "x" + str(hgt))
 
         sift = cv2.SIFT_create(nfeatures=100)
         keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
@@ -477,24 +470,6 @@ class QImageViewer(QMainWindow):
         outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
 
         img = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
-
-        # fig = plt.figure(figsize=(10, 7))
-        # rows = 1
-        # columns = 3
-
-        #     plt.imshow(image2)
-        #     plt.axis('off')
-        #     plt.title("Second")
-        #     plt.show()
-
-        #     plt.imshow(alignedImage)
-        #     plt.axis('off')
-        #     plt.title("Final")
-            # plt.show()
-
-        #aligned_image_path = f'ROT/{i}{base_image_extension}'
-        #cv2.imwrite(aligned_image_path, img)
-        #i = i + 1
         wid = img.shape[1]
         hgt = img.shape[0]
 
@@ -509,8 +484,205 @@ class QImageViewer(QMainWindow):
 
         #finalimages.append(alignedImage)
 
+    ref_point = []
+    cropping = False
+
+    def image_segmentation(self):
+        import cv2
+        imgsegment = self.imagesegmentAct.isChecked()
+        # # Convert numpy array to OpenCV image
+        image = cv2.imread(temp2)
+        
+
+        
+
+        def click_and_crop(event, x, y, flags, param):
+            global ref_point, cropping
+
+            if event == cv2.EVENT_LBUTTONDOWN:
+                ref_point = [(x, y)]
+                cropping = True
+
+            elif event == cv2.EVENT_LBUTTONUP:
+                ref_point.append((x, y))
+                cropping = False
+
+                # Display the ROI
+                # print(ref_point)
+                cv2.rectangle(image, ref_point[0], ref_point[1], (0, 255, 0), 2)
+                cv2.imshow("Image", image)
+
+        # Load the image
+        image_path = fileName  # Path to your image
+        image = cv2.imread(image_path)
+        clone = image.copy()
+
+        cv2.namedWindow("Image")
+        cv2.setMouseCallback("Image", click_and_crop)
+        print("Press c to confirm template")
+        print("Press r to reset")
+        while True:
+            cv2.imshow("Image", image)
+            
+
+            key = cv2.waitKey(1) & 0xFF
+
+            if key == ord("r"):  # Reset the image
+                image = clone.copy()
+
+            elif key == ord("c"):  # Crop the selected ROI as template
+                # print(ref_point)
+                if len(ref_point) == 2:
+                    template = clone[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
+                    # cv2.imshow("Template", template)
+                    cv2.imwrite("template.jpg", template)
+                    print("Template selection done")
+                    print("Press q")
+                else:
+                    print("Please select a valid ROI.")
+
+            elif key == ord("q"):  # Quit the program
+                break
+
+        cv2.destroyAllWindows()
+               
+        import numpy as np
+
+        def count_cells(image, template):
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+            h, w = template_gray.shape
+
+            # Apply template matching
+            result = cv2.matchTemplate(gray, template_gray, cv2.TM_CCOEFF_NORMED)
+
+            # Apply a threshold to obtain the binary mask of the detected cells
+            threshold = 0.7  # Adjust the threshold as per your requirement
+            loc = np.where(result >= threshold)
+
+            # Perform non-maximum suppression to remove duplicate detections
+            points = np.array(loc[::-1]).T
+            suppress = np.zeros((len(points),), dtype=bool)
+            for i in range(len(points)):
+                if not suppress[i]:
+                    for j in range(i+1, len(points)):
+                        if not suppress[j] and \
+                        abs(points[i][0] - points[j][0]) <= w and \
+                        abs(points[i][1] - points[j][1]) <= h:
+                            suppress[j] = True
+
+            # Filter out suppressed points
+            filtered_points = points[np.logical_not(suppress)]
+
+            # Count the number of cells
+            cell_count = len(filtered_points)
+
+            # Draw bounding boxes around the detected cells
+            for pt in filtered_points:
+                x, y = pt
+                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            return cell_count, image
+
+        # Load the main image
+        image_path = fileName  # Path to your image
+        image = cv2.imread(image_path)
+
+        # Load the template image
+        template_path = 'fft/template.jpg'  # Path to your template image
+        template = cv2.imread(template_path)
+
+        # Perform cell counting using template matching
+        count, counted_image = count_cells(image, template)
+
+        # Display the counted image
+        # cv2.imshow('Counted Image', counted_image)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
+        # Print the cell count
+        print(f"Number of cells detected: {count}")
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2,counted_image)
+        counted_image = QImage(temp2)
+        self.common(counted_image)
 
 
+
+
+        # cv2.imwrite(temp1,cv2.imread(temp2))
+        # cv2.imwrite(temp2,img)
+        # img = QImage(temp2)
+        # self.common(img)
+    def objectTracking(self):
+        import cv2
+        from tkinter import Tk, simpledialog
+        from tkinter.filedialog import askopenfilename
+
+        TrDict = {'csrt': cv2.legacy.TrackerCSRT_create,
+                'kcf': cv2.legacy.TrackerKCF_create,
+                'boosting': cv2.legacy.TrackerBoosting_create,
+                'mil': cv2.legacy.TrackerMIL_create,
+                'tld': cv2.legacy.TrackerTLD_create,
+                'medianflow': cv2.legacy.TrackerMedianFlow_create,
+                'mosse': cv2.legacy.TrackerMOSSE_create}
+
+        trackers = cv2.legacy.MultiTracker_create()
+
+        # Open file dialog to select video
+        Tk().withdraw()  # Hide the Tkinter main window
+        video_path = askopenfilename(title="Select Video")  # Show the file dialog
+
+        video_capture = cv2.VideoCapture(video_path)
+
+        if not video_capture.isOpened():
+            print("Error opening video file:", video_path)
+            exit()
+
+        ret, frame = video_capture.read()
+        
+        # Prompt user to enter the value of k
+        root = Tk()
+        root.withdraw()
+        k = simpledialog.askinteger("Input", "Enter the number of objects to be tracked:")
+
+        for i in range(k):
+            cv2.imshow('Frame', frame)
+            bbi = cv2.selectROI('Frame', frame)
+            tracker_i = TrDict['csrt']()
+            trackers.add(tracker_i, frame, bbi)
+
+        while True:
+            ret, frame = video_capture.read()
+            if not ret:
+                break
+
+            (success, boxes) = trackers.update(frame)
+            for box in boxes:
+                (x, y, w, h) = [int(a) for a in box]
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (100, 205, 200), 2)
+
+            cv2.imshow('Frame', frame)
+            key = cv2.waitKey(5) & 0xFF
+            if key == ord('q'):
+                break
+
+        video_capture.release()
+        cv2.destroyAllWindows()
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     def negative(self):
         negative = self.negative_action.isChecked()
         # # Convert numpy array to OpenCV image
@@ -883,6 +1055,8 @@ class QImageViewer(QMainWindow):
         self.sharpenAct = QAction("&Sharpen", self, enabled=False, triggered=self.sharpen)
         self.rotateAct = QAction("&Rotate", self, enabled=False, triggered=self.rotate)
         self.rotatemergeAct = QAction("&Rotate_Merge", self, enabled=False, triggered=self.rotate_merge)
+        self.imagesegmentAct = QAction("&Image segmentation", self, enabled=False, triggered=self.image_segmentation)
+        self.trackerAct = QAction("&Multi Object Tracking", self, triggered=self.objectTracking)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
         self.aboutQtAct = QAction("About &Qt", self, triggered=qApp.aboutQt)
@@ -924,6 +1098,8 @@ class QImageViewer(QMainWindow):
         self.editMenu.addAction(self.sharpenAct)
         self.editMenu.addAction(self.rotateAct)
         self.editMenu.addAction(self.rotatemergeAct)
+        self.editMenu.addAction(self.imagesegmentAct)
+        self.editMenu.addAction(self.trackerAct)
         self.editMenu.addSeparator()
         # self.viewMenu.addSeparator()
         # self.viewMenu.addAction(self.sharpen)
