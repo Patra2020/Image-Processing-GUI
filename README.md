@@ -1,4 +1,7 @@
 # Image-Processing-GUI
 
-https://github.com/flatplanet/pyqt5_youtube_playlist
+LenslessView - Basic GUI to live record the lensless microscope view
+It has been linked to:
+1) ImageJ
+2) Advanced GUI 
 
