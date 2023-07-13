@@ -14,6 +14,7 @@ import math
 import os
 import matplotlib.pyplot as plt
 from tkinter import Tk, simpledialog
+from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 
 # from tkinter import *
@@ -44,20 +45,6 @@ class QImageViewer(QMainWindow):
         self.createActions()
         self.createMenus()
 
-        # selfQHBoxLayout()
-        # self.slider = QSlider(Qt.Orientation.Horizontal, self)
-        # self.slider.setGeometry(5, 30, 200, 20)
-        # self.slider.setRange(1, 5)
-        # self.slider.setValue(1)
-        # self.slider.valueChanged.connect(self.smoothen)
-        # self.slider.setStyleSheet()
-        # label = QLabel("SMOOTHEN", self)
- 
-        # # setting geometry to the label
-        # label.setGeometry(55,30,200,20)
- 
-        # # making label multi line
-        # label.setWordWrap(True)
 
         
 
@@ -194,8 +181,10 @@ class QImageViewer(QMainWindow):
         self.smoothenAct.setEnabled(True)
         self.sharpenAct.setEnabled(True)
         self.rotateAct.setEnabled(True)
+        self.rotateaverageAct.setEnabled(True)
         self.rotatemergeAct.setEnabled(True)
         self.imagesegmentAct.setEnabled(True)
+        self.averageAct.setEnabled(True)
         self.updateActions()
 
         if not self.fitToWindowAct.isChecked():
@@ -214,8 +203,6 @@ class QImageViewer(QMainWindow):
 
             self.common(image)
             global temp1,temp2
-            temp1  = "temp1.jpg"
-            temp2 = "temp2.jpg"
             
             cv2.imwrite(temp1,cv2.imread(fileName))
             cv2.imwrite(temp2,cv2.imread(fileName))
@@ -293,16 +280,7 @@ class QImageViewer(QMainWindow):
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
         self.common(img)
-        '''
-        img = cv2.imread(temp2)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        #img_gaussian = cv2.GaussianBlur(gray,(3,3),0)
-        img_canny = cv2.Canny(img,100,200)
-        cv2.imwrite(temp1,cv2.imread(temp2))
-        cv2.imwrite(temp2,img_canny)
-        img = QImage(temp2)
-        self.common(img)'''
-
+    
     
     def sobeledge(self):
         img = cv2.imread(temp2)
@@ -333,27 +311,15 @@ class QImageViewer(QMainWindow):
 
 
     def rotate_merge(self):
-
-        
-
         #SELECT THE "base.bmp" file
-        import cv2
-        import os
-        import numpy as np
         image1 = cv2.imread(temp2)
         gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
         directory = os.path.dirname(fileName)
 
-
-        # base_image_path = 'base.bmp'
-        # image1 = cv2.imread(base_image_path)
-        # gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
         base_image_extension = os.path.splitext(fileName)[1]
 
         finalimages = []
         i = 0
-
-        from tkinter import Tk, simpledialog
 
             # Create the Tkinter root window
         root = Tk()
@@ -370,9 +336,6 @@ class QImageViewer(QMainWindow):
             gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
             wid = image2.shape[1]
             hgt = image2.shape[0]
-
-            # displaying the dimensions
-            #print(str(wid) + "x" + str(hgt))
 
             sift = cv2.SIFT_create(nfeatures=100)
             keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
@@ -403,16 +366,6 @@ class QImageViewer(QMainWindow):
             rows = 1
             columns = 3
 
-            # plt.imshow(image2)
-            # plt.axis('off')
-            # plt.title("Second")
-            # plt.show()
-
-            # plt.imshow(alignedImage)
-            # plt.axis('off')
-            # plt.title("Final")
-            # plt.show()
-            
          
 
             folder_path = user_input  # Specify the folder path
@@ -433,11 +386,7 @@ class QImageViewer(QMainWindow):
             #print(str(wid) + "x" + str(hgt))
             finalimages.append(alignedImage)
 
-
         directory = user_input
-        import numpy as np
-        import cv2
-        import os
 
         def findHomography(image_1_kp, image_2_kp, matches):
             image_1_points = np.zeros((len(matches), 1, 2), dtype=np.float32)
@@ -452,11 +401,8 @@ class QImageViewer(QMainWindow):
 
             return homography
 
-
-        #
         #   Align the images so they overlap properly...
-        #
-        #
+
         def align_images(images):
 
             #   SIFT generally produces better results, but it is not FOSS, so chose the feature detector
@@ -522,9 +468,8 @@ class QImageViewer(QMainWindow):
             blurred = cv2.GaussianBlur(image, (blur_size,blur_size), 0)
             return cv2.Laplacian(blurred, cv2.CV_64F, ksize=kernel_size)
 
-        #
+        
         #   This routine finds the points of best focus in all images and produces a merged result...
-        #
         def focus_stack(unimages):
             images = align_images(unimages)
 
@@ -551,10 +496,6 @@ class QImageViewer(QMainWindow):
 
         def stackHDRs(image_files):
             focusimages = []
-            #y=950
-            #x=1460
-            #h=170
-            #w=150
             for img in image_files:
                 print ("Reading in file {}".format(img))
                 imge = cv2.imread(f"{user_input}/{img}")
@@ -571,16 +512,121 @@ class QImageViewer(QMainWindow):
             self.common(merged)
 
         # global merged
-        if __name__ == "_main_":
-            image_files = sorted(os.listdir(user_input))
-            for img in image_files:
-                if img.split(".")[-1].lower() not in ["tif", "tiff", "png","bmp"]:
-                    image_files.remove(img)
+        image_files = sorted(os.listdir(user_input))
+        for img in image_files:
+            if img.split(".")[-1].lower() not in ["tif", "tiff", "png","jpg","jpeg","bmp"]:
+                image_files.remove(img)
 
 
-            stackHDRs(image_files)
-            print ("FINISHED!!!")
+        stackHDRs(image_files)
+        print ("FINISHED!!!")
 
+
+    def rotate_avg(self):
+        image1 = cv2.imread(temp2)
+        gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+        directory = os.path.dirname(fileName)
+
+        base_image_extension = os.path.splitext(fileName)[1]
+
+        finalimages = []
+        i = 0
+        root = Tk()
+
+            # Hide the root window
+        root.withdraw()
+
+            # Prompt the user for input
+        user_input = simpledialog.askstring("Input", "Enter the folder in which you want your rotated images")
+        for filename in os.listdir(directory):
+            f = os.path.join(directory, filename)
+            image2 = cv2.imread(f)
+            gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+            wid = image2.shape[1]
+            hgt = image2.shape[0]
+
+            sift = cv2.SIFT_create(nfeatures=100)
+            keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
+            keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
+
+            bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+            matches = bf.match(descriptors1, descriptors2)
+            matches = sorted(matches, key=lambda x: x.distance)
+
+            matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
+            matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
+
+            tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
+            sc = tform[0, 0]
+            ss = tform[0, 1]
+            scaleRecovered = np.sqrt(sc ** 2 + ss ** 2)
+            thetaRecovered = np.degrees(np.arctan2(-ss, sc))
+
+            print('Recovered scale:', scaleRecovered)
+            print('Recovered rotation angle:', thetaRecovered)
+
+            # Calculate the output size based on the larger image dimensions
+            outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
+
+            alignedImage = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
+
+            fig = plt.figure(figsize=(10, 7))
+            rows = 1
+            columns = 3
+
+         
+
+            folder_path = user_input  # Specify the folder path
+
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+                #print("Folder created successfully.")
+            # else:
+                #print("Folder already exists.")
+
+            aligned_image_path = f'{user_input}/{i}{base_image_extension}'
+            cv2.imwrite(aligned_image_path, alignedImage)
+            i = i + 1
+            wid = alignedImage.shape[1]
+            hgt = alignedImage.shape[0]
+
+            # displaying the dimensions
+            #print(str(wid) + "x" + str(hgt))
+            finalimages.append(alignedImage)
+
+        directory = user_input
+
+        merged_image = 0
+        i = 0
+        for filename in os.listdir(directory):
+            f = os.path.join(directory, filename)
+            i = i+1
+# for image in image_files:
+
+            image = cv2.imread(f)
+# Convert images to floating-point format
+
+# for image in finalimages:
+            image = image.astype(np.float32)/255.0
+            print(image.shape)
+            merged_image = merged_image + image
+            print(merged_image.shape)
+
+# Average the two images
+        merged_image = merged_image/i
+
+# Convert the merged image back to the uint8 format
+        merged_image = (merged_image * 255).astype(np.uint8)
+
+# Display the merged image
+            # plt.imshow(cv2.cvtColor(merged_image, cv2.COLOR_BGR2RGB))
+            # plt.axis('off')
+        cv2.imwrite('merged_sperm-specimen_average.bmp',merged_image)
+
+        cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2, merged_image)
+        merged_image = QImage(temp2)
+        self.common(merged_image)
 
 
     def rotate(self):
@@ -611,8 +657,6 @@ class QImageViewer(QMainWindow):
         scaleRecovered = np.sqrt(sc * 2 + ss * 2)
         thetaRecovered = np.degrees(np.arctan2(-ss, sc))
 
-        # print('Recovered scale:', scaleRecovered)
-        # print('Recovered rotation angle:', thetaRecovered)
 
             # Calculate the output size based on the larger image dimensions
         outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
@@ -620,9 +664,6 @@ class QImageViewer(QMainWindow):
         img = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
         wid = img.shape[1]
         hgt = img.shape[0]
-
-            # displaying the dimensions
-        #print(str(wid) + "x" + str(hgt))
 
         cv2.imwrite(temp1,cv2.imread(temp2))
         cv2.imwrite(temp2, img)
@@ -635,13 +676,53 @@ class QImageViewer(QMainWindow):
     ref_point = []
     cropping = False
 
+ 
+
+    def average(self):
+        root = Tk()
+
+            # Hide the root window
+        root.withdraw()
+
+            # Prompt the user for input
+        user_input = simpledialog.askstring("Input", "Enter the name of folder in which you have rotated images")    
+        merged_image = 0
+        i = 0
+        directory = user_input
+        for filename in os.listdir(directory):
+            f = os.path.join(directory, filename)
+            i = i+1
+# for image in image_files:
+
+            image = cv2.imread(f)
+# Convert images to floating-point format
+
+# for image in finalimages:
+            image = image.astype(np.float32)/255.0
+            #rint(image.shape)
+            merged_image = merged_image + image
+            #print(merged_image.shape)
+        merged_image = merged_image/i
+
+# Convert the merged image back to the uint8 format
+        merged_image = (merged_image * 255).astype(np.uint8)
+
+# Display the merged image
+        cv2.imwrite('merged_sperm-specimen_average.bmp',merged_image)
+        # temp1  = "temp1.jpg"
+        # temp2 = "temp2.jpg"
+            
+        #cv2.imwrite(temp1,cv2.imread(temp2))
+        cv2.imwrite(temp2, merged_image)
+        merged_image = QImage(temp2)
+        self.common(merged_image)
+
+
+
     def image_segmentation(self):
-        import cv2
         imgsegment = self.imagesegmentAct.isChecked()
         # # Convert numpy array to OpenCV image
         image = cv2.imread(temp2)
-        
-
         
 
         def click_and_crop(event, x, y, flags, param):
@@ -693,8 +774,6 @@ class QImageViewer(QMainWindow):
                 break
 
         cv2.destroyAllWindows()
-               
-        import numpy as np
 
         def count_cells(image, template):
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -737,7 +816,7 @@ class QImageViewer(QMainWindow):
         image = cv2.imread(image_path)
 
         # Load the template image
-        template_path = 'fft/template.jpg'  # Path to your template image
+        template_path = 'template.jpg'  # Path to your template image
         template = cv2.imread(template_path)
 
         # Perform cell counting using template matching
@@ -757,16 +836,7 @@ class QImageViewer(QMainWindow):
 
 
 
-
-        # cv2.imwrite(temp1,cv2.imread(temp2))
-        # cv2.imwrite(temp2,img)
-        # img = QImage(temp2)
-        # self.common(img)
     def objectTracking(self):
-        import cv2
-        from tkinter import Tk, simpledialog
-        from tkinter.filedialog import askopenfilename
-
         TrDict = {'csrt': cv2.legacy.TrackerCSRT_create,
                 'kcf': cv2.legacy.TrackerKCF_create,
                 'boosting': cv2.legacy.TrackerBoosting_create,
@@ -793,6 +863,8 @@ class QImageViewer(QMainWindow):
         root = Tk()
         root.withdraw()
         k = simpledialog.askinteger("Input", "Enter the number of objects to be tracked:")
+
+        messagebox.showinfo(title="Procedure", message="Select your objects with cursor and click 'enter' after each selection. Press q to exit")
 
         for i in range(k):
             cv2.imshow('Frame', frame)
@@ -825,18 +897,6 @@ class QImageViewer(QMainWindow):
 
         video_capture.release()
         cv2.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-
-
-
 
         
     def negative(self):
@@ -940,7 +1000,6 @@ class QImageViewer(QMainWindow):
         self.advlowpassAct.isChecked()
         img = cv2.imread(temp2)
 
-
         # do dft saving as complex output
         dft = np.fft.fft2(img, axes=(0,1))
 
@@ -1034,13 +1093,7 @@ class QImageViewer(QMainWindow):
         # img_filtered2 = np.abs(3*img_filtered2).clip(0,255).astype(np.uint8)
 
 
-        # cv2.imshow("ORIGINAL", img)
-        # cv2.imshow("SPECTRUM", spec)
-        # cv2.imshow("MASK", mask)
-        # cv2.imshow("MASK2", mask2)
-        # cv2.imshow("ORIGINAL DFT/IFT ROUND TRIP", img_back)
-        # cv2.imshow("FILTERED DFT/IFT ROUND TRIP", img_filtered)
-        # cv2.imshow("FILTERED2 DFT/IFT ROUND TRIP", img_filtered2)
+        
         cv2.imwrite(temp1,cv2.imread(temp2))
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
@@ -1092,67 +1145,10 @@ class QImageViewer(QMainWindow):
         # img = np.abs(3*img_filtered).clip(0,255).astype(np.uint8)
         img = np.abs(3*img_filtered2).clip(0,255).astype(np.uint8)
 
-
-        # cv2.imshow("ORIGINAL", img)
-        # cv2.imshow("SPECTRUM", spec)
-        # cv2.imshow("MASK", mask)
-        # cv2.imshow("MASK2", mask2)
-        # cv2.imshow("ORIGINAL DFT/IFT ROUND TRIP", img_back)
-        # cv2.imshow("FILTERED DFT/IFT ROUND TRIP", img_filtered)
-        # cv2.imshow("FILTERED2 DFT/IFT ROUND TRIP", img_filtered2)
         cv2.imwrite(temp1,cv2.imread(temp2))
         cv2.imwrite(temp2,img)
         img = QImage(temp2)
         self.common(img)
-
-    
-    # def smoothen(self,value):
-    #     # temp1_pic = cv2.imread(temp2)
-    #     # temp2_pic = cv2.imread(temp2)
-    #     # temp3_pic = cv2.imread(temp2)
-    #     # temp4_pic = cv2.imread(temp2)
-    #     # temp5_pic = cv2.imread(temp2)
-        
-    #     print(value)
-    #     # kernelSizes = [(1, 1), (2, 2), (3, 3),(4,4),(5,5)]
-    #     # # loop over the kernel sizes
-    #     # for (kX, kY) in kernelSizes:
-    #     img = cv2.imread(temp2)
-    #     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    #     # kX = kY = value
-    #     kernel2_1 = np.ones((1,1), np.float32)/25
-    #     temp1_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_1)
-    #     kernel2_2 = np.ones((2,2), np.float32)/25
-    #     temp2_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_2)
-    #     kernel2_3 = np.ones((3,3), np.float32)/25
-    #     temp3_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_3)
-    #     kernel2_4 = np.ones((4,4), np.float32)/25
-    #     temp4_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_4)
-    #     kernel2_5 = np.ones((5,5), np.float32)/25
-    #     temp5_pic = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2_5)
-
-
-    #     # img = cv2.filter2D(src=img, ddepth=-1, kernel=kernel2)
-
-    #     if(value == 1):
-    #         img = temp1_pic
-    #     elif(value == 2):
-    #         img = temp2_pic
-    #     elif(value == 3):
-    #         img = temp3_pic
-    #     elif(value == 4):
-    #         img = temp4_pic
-    #     elif(value == 5):
-    #         img = temp5_pic
-    #     # cv2.imwrite(temp1,cv2.imread(temp2))
-    #     # cv2.imwrite(temp2,img)
-    #     img = QImage(img)
-    #     self.common(img)
-
-
-
-
-
 
 
     def normalize(self):
@@ -1199,21 +1195,23 @@ class QImageViewer(QMainWindow):
                                       triggered=self.fitToWindow)
         ########################################################################################################
         self.negative_action = QAction("&Negative", self, enabled=False, triggered=self.negative)
-        self.cannyedgeAct = QAction("&CannyEdge", self, enabled=False, triggered=self.cannyedge)
+        self.cannyedgeAct = QAction("&Canny Edge", self, enabled=False, triggered=self.cannyedge)
         self.undoAct = QAction("&Undo...", self, shortcut="Ctrl+Z", triggered=self.undo)
         self.normalizeAct = QAction("&Normalize", self, enabled=False, triggered=self.normalize)
-        self.sobeledgeAct = QAction("&SobelEdge", self, enabled=False, triggered=self.sobeledge)
-        self.prewittedgeAct = QAction("&PrewittEdge", self, enabled=False, triggered=self.prewittedge)
-        self.lowpassAct = QAction("&LowPassFilter", self, enabled=False, triggered=self.lowpass)
-        self.advlowpassAct = QAction("&AdvancedLowPassFilter", self, enabled=False, triggered=self.advlowpass)
-        self.highpassAct = QAction("&HighPassFilter", self, enabled=False, triggered=self.highpass)
-        self.advhighpassAct = QAction("&AdvancedHighPassFilter", self, enabled=False, triggered=self.advhighpass)
+        self.sobeledgeAct = QAction("&Sobel Edge", self, enabled=False, triggered=self.sobeledge)
+        self.prewittedgeAct = QAction("&Prewitt Edge", self, enabled=False, triggered=self.prewittedge)
+        self.lowpassAct = QAction("&Low Pass Filter", self, enabled=False, triggered=self.lowpass)
+        self.advlowpassAct = QAction("&Advanced LowPass Filter", self, enabled=False, triggered=self.advlowpass)
+        self.highpassAct = QAction("&High Pass Filter", self, enabled=False, triggered=self.highpass)
+        self.advhighpassAct = QAction("&Advanced HighPass Filter", self, enabled=False, triggered=self.advhighpass)
         self.rulerAct = QAction("&Ruler", self, enabled=False, triggered=self.ruler)
         self.smoothenAct = QAction("&Smoothen", self, enabled=False, triggered=self.smoothen)
         self.sharpenAct = QAction("&Sharpen", self, enabled=False, triggered=self.sharpen)
         self.rotateAct = QAction("&Rotate", self, enabled=False, triggered=self.rotate)
-        self.rotatemergeAct = QAction("&Rotate_Merge", self, enabled=False, triggered=self.rotate_merge)
+        self.rotateaverageAct = QAction("&Rotate Average", self, enabled=False, triggered=self.rotate_avg)
+        self.rotatemergeAct = QAction("&Rotate Merge", self, enabled=False, triggered=self.rotate_merge)
         self.imagesegmentAct = QAction("&Image segmentation", self, enabled=False, triggered=self.image_segmentation)
+        self.averageAct = QAction("&Image Averaging", self, triggered=self.average)
         self.trackerAct = QAction("&Multi Object Tracking", self, triggered=self.objectTracking)
         #########################################################################################################
         self.aboutAct = QAction("&About", self, triggered=self.about)
@@ -1230,14 +1228,7 @@ class QImageViewer(QMainWindow):
         self.viewMenu = QMenu("&View", self)
         self.viewMenu.addAction(self.zoomInAct)
         self.viewMenu.addAction(self.zoomOutAct)
-        # self.viewMenu.addAction(self.zoomInAct1)
-        # self.viewMenu.addAction(self.zoomOutAct1)
-        # self.viewMenu.addAction(self.zoomInAct5)
-        # self.viewMenu.addAction(self.zoomOutAct5)
-        # self.viewMenu.addAction(self.zoomInAct10)
-        # self.viewMenu.addAction(self.zoomOutAct10)
-        # self.viewMenu.addAction(self.zoomInAct25)
-        # self.viewMenu.addAction(self.zoomOutAct25)
+        
         self.viewMenu.addAction(self.normalSizeAct)
         self.viewMenu.addSeparator()
         self.viewMenu.addAction(self.fitToWindowAct)
@@ -1253,9 +1244,11 @@ class QImageViewer(QMainWindow):
 
         self.rotMenu = QMenu("&Advanced IP", self)
         self.rotMenu.addAction(self.rotateAct)
+        self.rotMenu.addAction(self.rotateaverageAct)
         self.rotMenu.addAction(self.rotatemergeAct)
         self.rotMenu.addAction(self.imagesegmentAct)
         self.rotMenu.addAction(self.trackerAct)
+        self.rotMenu.addAction(self.averageAct)
         self.rotMenu.addSeparator()
         # self.viewMenu.addSeparator()
         # self.viewMenu.addAction(self.sharpen)
@@ -1303,14 +1296,6 @@ class QImageViewer(QMainWindow):
         self.adjustScrollBar(self.scrollArea.horizontalScrollBar(), factor)
         self.adjustScrollBar(self.scrollArea.verticalScrollBar(), factor)
 
-        # self.zoomInAct1.setEnabled(self.scaleFactor < 3.0)
-        # self.zoomOutAct1.setEnabled(self.scaleFactor > 0.333)
-        # self.zoomInAct5.setEnabled(self.scaleFactor < 3.0)
-        # self.zoomOutAct5.setEnabled(self.scaleFactor > 0.333)
-        # self.zoomInAct10.setEnabled(self.scaleFactor < 3.0)
-        # self.zoomOutAct10.setEnabled(self.scaleFactor > 0.333)
-        # self.zoomInAct25.setEnabled(self.scaleFactor < 3.0)
-        # self.zoomOutAct25.setEnabled(self.scaleFactor > 0.333)
 
     def adjustScrollBar(self, scrollBar, factor):
         scrollBar.setValue(int(factor * scrollBar.value()
@@ -1318,12 +1303,12 @@ class QImageViewer(QMainWindow):
     
     
 
-
-
 if __name__ == '__main__':
     import sys
     from PyQt5.QtWidgets import QApplication
 
+    temp1  = "temp1.jpg"
+    temp2 = "temp2.jpg"
     app = QApplication(sys.argv)
     imageViewer = QImageViewer()
     imageViewer.show()
