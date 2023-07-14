@@ -89,7 +89,7 @@ class QImageViewer(QMainWindow):
                 self.clone = self.original_image.copy()
 
                 cv2.namedWindow('image',cv2.WINDOW_NORMAL)
-                # cv2.resizeWindow('image',)
+                cv2.resizeWindow('image',(800,600))
                 cv2.setMouseCallback('image', self.extract_coordinates)
 
                 # List to store start/end points
@@ -181,8 +181,8 @@ class QImageViewer(QMainWindow):
         self.smoothenAct.setEnabled(True)
         self.sharpenAct.setEnabled(True)
         self.rotateAct.setEnabled(True)
-        self.rotateaverageAct.setEnabled(True)
-        self.rotatemergeAct.setEnabled(True)
+        # self.rotateaverageAct.setEnabled(True)
+        # self.rotatemergeAct.setEnabled(True)
         self.imagesegmentAct.setEnabled(True)
         self.averageAct.setEnabled(True)
         self.updateActions()
@@ -223,42 +223,23 @@ class QImageViewer(QMainWindow):
         cv2.imwrite(temp2,cv2.imread(temp1))
         img = QImage(temp2)
         self.common(img)
-        
-    def zoomIn1(self):
-        self.scaleImage(1.01)
-
-    def zoomOut1(self):
-        self.scaleImage(0.99)
-    def zoomIn5(self):
-        self.scaleImage(1.05)
-
-    def zoomOut5(self):
-        self.scaleImage(0.95)
-    def zoomIn10(self):
-        self.scaleImage(1.1)
-
-    def zoomOut10(self):
-        self.scaleImage(0.9)
-    def zoomIn25(self):
-        self.scaleImage(1.25)
 
 
     def zoomIn(self):
         root = Tk()
         root.withdraw()
         k = simpledialog.askinteger("Input", "Enter the percentage of zoom in:")
-        self.scaleImage(1+(k/100))
+        if(type(k)!=type(None)):
+            self.scaleImage(1+(k/100))
+            # print(type(self.scaleImage(1+(k/100))))
 
     def zoomOut(self):
         root = Tk()
         root.withdraw()
         k = simpledialog.askinteger("Input", "Enter the percentage of zoom out:")
-        self.scaleImage(1-(k/100))
-
-
-    def zoomOut25(self):
-        self.scaleImage(0.75)
-
+        if(type(k)!=type(None)):
+            self.scaleImage(1-(k/100))
+        
     def normalSize(self):
         self.imageLabel.adjustSize()
         self.scaleFactor = 1.0
@@ -310,219 +291,472 @@ class QImageViewer(QMainWindow):
         self.common(img)
 
 
-    def rotate_merge(self):
-        #SELECT THE "base.bmp" file
-        image1 = cv2.imread(temp2)
-        gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
-        directory = os.path.dirname(fileName)
+    # def rotate_merge(self):
+    #     #SELECT THE "base.bmp" file
+    #     image1 = cv2.imread(temp2)
+    #     gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+    #     directory = os.path.dirname(fileName)
 
-        base_image_extension = os.path.splitext(fileName)[1]
+    #     base_image_extension = os.path.splitext(fileName)[1]
 
-        finalimages = []
-        i = 0
+    #     finalimages = []
+    #     i = 0
 
-            # Create the Tkinter root window
+    #         # Create the Tkinter root window
+    #     root = Tk()
+
+    #         # Hide the root window
+    #     root.withdraw()
+
+    #         # Prompt the user for input
+    #     user_input = simpledialog.askstring("Input", "Enter the folder you want your rotated images in")
+    #     #directory = 'RotationExperiment'
+    #     for filename in os.listdir(directory):
+    #         f = os.path.join(directory, filename)
+    #         image2 = cv2.imread(f)
+    #         gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+    #         wid = image2.shape[1]
+    #         hgt = image2.shape[0]
+
+    #         sift = cv2.SIFT_create(nfeatures=100)
+    #         keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
+    #         keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
+
+    #         bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+    #         matches = bf.match(descriptors1, descriptors2)
+    #         matches = sorted(matches, key=lambda x: x.distance)
+
+    #         matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
+    #         matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
+
+    #         tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
+    #         sc = tform[0, 0]
+    #         ss = tform[0, 1]
+    #         scaleRecovered = np.sqrt(sc ** 2 + ss ** 2)
+    #         thetaRecovered = np.degrees(np.arctan2(-ss, sc))
+
+    #         print('Recovered scale:', scaleRecovered)
+    #         print('Recovered rotation angle:', thetaRecovered)
+
+    #         # Calculate the output size based on the larger image dimensions
+    #         outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
+
+    #         alignedImage = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
+
+    #         fig = plt.figure(figsize=(10, 7))
+    #         rows = 1
+    #         columns = 3
+
+         
+
+    #         folder_path = user_input  # Specify the folder path
+
+    #         if not os.path.exists(folder_path):
+    #             os.makedirs(folder_path)
+    #             #print("Folder created successfully.")
+    #         # else:
+    #             #print("Folder already exists.")
+
+    #         aligned_image_path = f'{user_input}/{i}{base_image_extension}'
+    #         cv2.imwrite(aligned_image_path, alignedImage)
+    #         i = i + 1
+    #         wid = alignedImage.shape[1]
+    #         hgt = alignedImage.shape[0]
+
+    #         # displaying the dimensions
+    #         #print(str(wid) + "x" + str(hgt))
+    #         finalimages.append(alignedImage)
+
+    #     directory = user_input
+
+    #     def findHomography(image_1_kp, image_2_kp, matches):
+    #         image_1_points = np.zeros((len(matches), 1, 2), dtype=np.float32)
+    #         image_2_points = np.zeros((len(matches), 1, 2), dtype=np.float32)
+
+    #         for i in range(0,len(matches)):
+    #             image_1_points[i] = image_1_kp[matches[i].queryIdx].pt
+    #             image_2_points[i] = image_2_kp[matches[i].trainIdx].pt
+
+
+    #         homography, mask = cv2.findHomography(image_1_points, image_2_points, cv2.RANSAC, ransacReprojThreshold=2.0)
+
+    #         return homography
+
+    #     #   Align the images so they overlap properly...
+
+    #     def align_images(images):
+
+    #         #   SIFT generally produces better results, but it is not FOSS, so chose the feature detector
+    #         #   that suits the needs of your project.  ORB does OK
+    #         use_sift = True
+
+    #         outimages = []
+
+    #         if use_sift:
+    #             detector = cv2.SIFT_create()
+    #         else:
+    #             detector = cv2.ORB_create(1000)
+
+    #         #   We assume that image 0 is the "base" image and align everything to it
+    #         print ("Detecting features of base image")
+    #         outimages.append(images[0])
+    #         image1gray = cv2.cvtColor(images[0],cv2.COLOR_BGR2GRAY)
+    #         image_1_kp, image_1_desc = detector.detectAndCompute(image1gray, None)
+
+    #         for i in range(1,len(images)):
+    #             print ("Aligning image {}".format(i))
+    #             image_i_kp, image_i_desc = detector.detectAndCompute(images[i], None)
+
+    #             if use_sift:
+    #                 bf = cv2.BFMatcher()
+    #                 # This returns the top two matches for each feature point (list of list)
+    #                 pairMatches = bf.knnMatch(image_i_desc,image_1_desc, k=2)
+    #                 rawMatches = []
+    #                 for m,n in pairMatches:
+    #                     if m.distance < 0.7*n.distance:
+    #                         rawMatches.append(m)
+    #             else:
+    #                 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    #                 rawMatches = bf.match(image_i_desc, image_1_desc)
+
+    #             sortMatches = sorted(rawMatches, key=lambda x: x.distance)
+    #             matches = sortMatches[0:128]
+
+
+
+    #             hom = findHomography(image_i_kp, image_1_kp, matches)
+    #             newimage = cv2.warpPerspective(images[i], hom, (images[i].shape[1], images[i].shape[0]), flags=cv2.INTER_LINEAR)
+
+    #             outimages.append(newimage)
+    #             # If you find that there's a large amount of ghosting, it may be because one or more of the input
+    #             # images gets misaligned.  Outputting the aligned images may help diagnose that.
+    #             # cv2.imwrite("aligned{}.png".format(i), newimage)
+
+
+
+    #         return outimages
+
+    #     #
+    #     #   Compute the gradient map of the image
+    #     def doLap(image):
+
+    #         # YOU SHOULD TUNE THESE VALUES TO SUIT YOUR NEEDS
+    #         kernel_size = 3         # Size of the laplacian window
+    #         blur_size = 3           # How big of a kernal to use for the gaussian blur
+    #                                 # Generally, keeping these two values the same or very close works well
+    #                                 # Also, odd numbers, please...
+
+    #         blurred = cv2.GaussianBlur(image, (blur_size,blur_size), 0)
+    #         return cv2.Laplacian(blurred, cv2.CV_64F, ksize=kernel_size)
+
+        
+    #     #   This routine finds the points of best focus in all images and produces a merged result...
+    #     def focus_stack(unimages):
+    #         images = align_images(unimages)
+
+    #         print ("Computing the laplacian of the blurred images")
+    #         laps = []
+    #         for i in range(len(images)):
+    #             print ("Lap {}".format(i))
+    #             laps.append(doLap(cv2.cvtColor(images[i],cv2.COLOR_BGR2GRAY)))
+
+    #         laps = np.asarray(laps)
+    #         print ("Shape of array of laplacians = {}".format(laps.shape))
+
+    #         output = np.zeros(shape=images[0].shape, dtype=images[0].dtype)
+
+    #         abs_laps = np.absolute(laps)
+    #         maxima = abs_laps.max(axis=0)
+    #         bool_mask = abs_laps == maxima
+    #         mask = bool_mask.astype(np.uint8)
+    #         for i in range(0,len(images)):
+    #             output = cv2.bitwise_not(images[i],output, mask=mask[i])
+                
+    #         return 255-output
+
+
+    #     def stackHDRs(image_files):
+    #         focusimages = []
+    #         for img in image_files:
+    #             print ("Reading in file {}".format(img))
+    #             imge = cv2.imread(f"{user_input}/{img}")
+    #             crop_img = imge#[y:y+h, x:x+w]
+    #             focusimages.append(crop_img)
+    #             #focusimages.append(cv2.imread("Zcombi_1902_1926/{}".format(img)))
+
+            
+    #         merged = focus_stack(focusimages)
+    #         cv2.imwrite("multi-focus-result.bmp", merged)
+    #         cv2.imwrite(temp1,cv2.imread(temp2))
+    #         cv2.imwrite(temp2, merged)
+    #         merged = QImage(temp2)
+    #         self.common(merged)
+
+    #     # global merged
+    #     image_files = sorted(os.listdir(user_input))
+    #     for img in image_files:
+    #         if img.split(".")[-1].lower() not in ["tif", "tiff", "png","jpg","jpeg","bmp"]:
+    #             image_files.remove(img)
+
+
+    #     stackHDRs(image_files)
+    #     print ("FINISHED!!!")
+
+
+#     def rotate_avg(self):
+#         image1 = cv2.imread(temp2)
+#         gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+#         directory = os.path.dirname(fileName)
+
+#         base_image_extension = os.path.splitext(fileName)[1]
+
+#         finalimages = []
+#         i = 0
+#         root = Tk()
+
+#             # Hide the root window
+#         root.withdraw()
+
+#             # Prompt the user for input
+#         user_input = simpledialog.askstring("Input", "Enter the folder in which you want your rotated images")
+#         for filename in os.listdir(directory):
+#             f = os.path.join(directory, filename)
+#             image2 = cv2.imread(f)
+#             gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+#             wid = image2.shape[1]
+#             hgt = image2.shape[0]
+
+#             sift = cv2.SIFT_create(nfeatures=100)
+#             keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
+#             keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
+
+#             bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+#             matches = bf.match(descriptors1, descriptors2)
+#             matches = sorted(matches, key=lambda x: x.distance)
+
+#             matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
+#             matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
+
+#             tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
+#             sc = tform[0, 0]
+#             ss = tform[0, 1]
+#             scaleRecovered = np.sqrt(sc ** 2 + ss ** 2)
+#             thetaRecovered = np.degrees(np.arctan2(-ss, sc))
+
+#             print('Recovered scale:', scaleRecovered)
+#             print('Recovered rotation angle:', thetaRecovered)
+
+#             # Calculate the output size based on the larger image dimensions
+#             outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
+
+#             alignedImage = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
+
+#             fig = plt.figure(figsize=(10, 7))
+#             rows = 1
+#             columns = 3
+
+         
+
+#             folder_path = user_input  # Specify the folder path
+
+#             if not os.path.exists(folder_path):
+#                 os.makedirs(folder_path)
+#                 #print("Folder created successfully.")
+#             # else:
+#                 #print("Folder already exists.")
+
+#             aligned_image_path = f'{user_input}/{i}{base_image_extension}'
+#             cv2.imwrite(aligned_image_path, alignedImage)
+#             i = i + 1
+#             wid = alignedImage.shape[1]
+#             hgt = alignedImage.shape[0]
+
+#             # displaying the dimensions
+#             #print(str(wid) + "x" + str(hgt))
+#             finalimages.append(alignedImage)
+
+#         directory = user_input
+
+#         merged_image = 0
+#         i = 0
+#         for filename in os.listdir(directory):
+#             f = os.path.join(directory, filename)
+#             i = i+1
+# # for image in image_files:
+
+#             image = cv2.imread(f)
+# # Convert images to floating-point format
+
+# # for image in finalimages:
+#             image = image.astype(np.float32)/255.0
+#             print(image.shape)
+#             merged_image = merged_image + image
+#             print(merged_image.shape)
+
+# # Average the two images
+#         merged_image = merged_image/i
+
+# # Convert the merged image back to the uint8 format
+#         merged_image = (merged_image * 255).astype(np.uint8)
+
+# # Display the merged image
+#             # plt.imshow(cv2.cvtColor(merged_image, cv2.COLOR_BGR2RGB))
+#             # plt.axis('off')
+#         cv2.imwrite('merged_sperm-specimen_average.bmp',merged_image)
+
+#         cv2.imwrite(temp1,cv2.imread(temp2))
+#         cv2.imwrite(temp2, merged_image)
+#         merged_image = QImage(temp2)
+#         self.common(merged_image)
+
+
+
+    def focus_stack(self):
         root = Tk()
 
             # Hide the root window
         root.withdraw()
 
             # Prompt the user for input
-        user_input = simpledialog.askstring("Input", "Enter the folder you want your rotated images in")
-        #directory = 'RotationExperiment'
-        for filename in os.listdir(directory):
-            f = os.path.join(directory, filename)
-            image2 = cv2.imread(f)
-            gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
-            wid = image2.shape[1]
-            hgt = image2.shape[0]
+        user_input = simpledialog.askstring("Input", "Enter the path of the folder in which you have rotated images")
+        if(type(user_input)!=type(None)):        
+            directory = user_input
+            def findHomography(image_1_kp, image_2_kp, matches):
+                image_1_points = np.zeros((len(matches), 1, 2), dtype=np.float32)
+                image_2_points = np.zeros((len(matches), 1, 2), dtype=np.float32)
 
-            sift = cv2.SIFT_create(nfeatures=100)
-            keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
-            keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
-
-            bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-            matches = bf.match(descriptors1, descriptors2)
-            matches = sorted(matches, key=lambda x: x.distance)
-
-            matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
-            matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
-
-            tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
-            sc = tform[0, 0]
-            ss = tform[0, 1]
-            scaleRecovered = np.sqrt(sc ** 2 + ss ** 2)
-            thetaRecovered = np.degrees(np.arctan2(-ss, sc))
-
-            print('Recovered scale:', scaleRecovered)
-            print('Recovered rotation angle:', thetaRecovered)
-
-            # Calculate the output size based on the larger image dimensions
-            outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
-
-            alignedImage = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
-
-            fig = plt.figure(figsize=(10, 7))
-            rows = 1
-            columns = 3
-
-         
-
-            folder_path = user_input  # Specify the folder path
-
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
-                #print("Folder created successfully.")
-            # else:
-                #print("Folder already exists.")
-
-            aligned_image_path = f'{user_input}/{i}{base_image_extension}'
-            cv2.imwrite(aligned_image_path, alignedImage)
-            i = i + 1
-            wid = alignedImage.shape[1]
-            hgt = alignedImage.shape[0]
-
-            # displaying the dimensions
-            #print(str(wid) + "x" + str(hgt))
-            finalimages.append(alignedImage)
-
-        directory = user_input
-
-        def findHomography(image_1_kp, image_2_kp, matches):
-            image_1_points = np.zeros((len(matches), 1, 2), dtype=np.float32)
-            image_2_points = np.zeros((len(matches), 1, 2), dtype=np.float32)
-
-            for i in range(0,len(matches)):
-                image_1_points[i] = image_1_kp[matches[i].queryIdx].pt
-                image_2_points[i] = image_2_kp[matches[i].trainIdx].pt
+                for i in range(0,len(matches)):
+                    image_1_points[i] = image_1_kp[matches[i].queryIdx].pt
+                    image_2_points[i] = image_2_kp[matches[i].trainIdx].pt
 
 
-            homography, mask = cv2.findHomography(image_1_points, image_2_points, cv2.RANSAC, ransacReprojThreshold=2.0)
+                homography, mask = cv2.findHomography(image_1_points, image_2_points, cv2.RANSAC, ransacReprojThreshold=2.0)
 
-            return homography
+                return homography
 
-        #   Align the images so they overlap properly...
+            #   Align the images so they overlap properly...
 
-        def align_images(images):
+            def align_images(images):
 
-            #   SIFT generally produces better results, but it is not FOSS, so chose the feature detector
-            #   that suits the needs of your project.  ORB does OK
-            use_sift = True
+                #   SIFT generally produces better results, but it is not FOSS, so chose the feature detector
+                #   that suits the needs of your project.  ORB does OK
+                use_sift = True
 
-            outimages = []
-
-            if use_sift:
-                detector = cv2.SIFT_create()
-            else:
-                detector = cv2.ORB_create(1000)
-
-            #   We assume that image 0 is the "base" image and align everything to it
-            print ("Detecting features of base image")
-            outimages.append(images[0])
-            image1gray = cv2.cvtColor(images[0],cv2.COLOR_BGR2GRAY)
-            image_1_kp, image_1_desc = detector.detectAndCompute(image1gray, None)
-
-            for i in range(1,len(images)):
-                print ("Aligning image {}".format(i))
-                image_i_kp, image_i_desc = detector.detectAndCompute(images[i], None)
+                outimages = []
 
                 if use_sift:
-                    bf = cv2.BFMatcher()
-                    # This returns the top two matches for each feature point (list of list)
-                    pairMatches = bf.knnMatch(image_i_desc,image_1_desc, k=2)
-                    rawMatches = []
-                    for m,n in pairMatches:
-                        if m.distance < 0.7*n.distance:
-                            rawMatches.append(m)
+                    detector = cv2.SIFT_create()
                 else:
-                    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-                    rawMatches = bf.match(image_i_desc, image_1_desc)
+                    detector = cv2.ORB_create(1000)
 
-                sortMatches = sorted(rawMatches, key=lambda x: x.distance)
-                matches = sortMatches[0:128]
+                #   We assume that image 0 is the "base" image and align everything to it
+                print ("Detecting features of base image")
+                outimages.append(images[0])
+                image1gray = cv2.cvtColor(images[0],cv2.COLOR_BGR2GRAY)
+                image_1_kp, image_1_desc = detector.detectAndCompute(image1gray, None)
 
+                for i in range(1,len(images)):
+                    print ("Aligning image {}".format(i))
+                    image_i_kp, image_i_desc = detector.detectAndCompute(images[i], None)
 
+                    if use_sift:
+                        bf = cv2.BFMatcher()
+                        # This returns the top two matches for each feature point (list of list)
+                        pairMatches = bf.knnMatch(image_i_desc,image_1_desc, k=2)
+                        rawMatches = []
+                        for m,n in pairMatches:
+                            if m.distance < 0.7*n.distance:
+                                rawMatches.append(m)
+                    else:
+                        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+                        rawMatches = bf.match(image_i_desc, image_1_desc)
 
-                hom = findHomography(image_i_kp, image_1_kp, matches)
-                newimage = cv2.warpPerspective(images[i], hom, (images[i].shape[1], images[i].shape[0]), flags=cv2.INTER_LINEAR)
-
-                outimages.append(newimage)
-                # If you find that there's a large amount of ghosting, it may be because one or more of the input
-                # images gets misaligned.  Outputting the aligned images may help diagnose that.
-                # cv2.imwrite("aligned{}.png".format(i), newimage)
-
-
-
-            return outimages
-
-        #
-        #   Compute the gradient map of the image
-        def doLap(image):
-
-            # YOU SHOULD TUNE THESE VALUES TO SUIT YOUR NEEDS
-            kernel_size = 3         # Size of the laplacian window
-            blur_size = 3           # How big of a kernal to use for the gaussian blur
-                                    # Generally, keeping these two values the same or very close works well
-                                    # Also, odd numbers, please...
-
-            blurred = cv2.GaussianBlur(image, (blur_size,blur_size), 0)
-            return cv2.Laplacian(blurred, cv2.CV_64F, ksize=kernel_size)
-
-        
-        #   This routine finds the points of best focus in all images and produces a merged result...
-        def focus_stack(unimages):
-            images = align_images(unimages)
-
-            print ("Computing the laplacian of the blurred images")
-            laps = []
-            for i in range(len(images)):
-                print ("Lap {}".format(i))
-                laps.append(doLap(cv2.cvtColor(images[i],cv2.COLOR_BGR2GRAY)))
-
-            laps = np.asarray(laps)
-            print ("Shape of array of laplacians = {}".format(laps.shape))
-
-            output = np.zeros(shape=images[0].shape, dtype=images[0].dtype)
-
-            abs_laps = np.absolute(laps)
-            maxima = abs_laps.max(axis=0)
-            bool_mask = abs_laps == maxima
-            mask = bool_mask.astype(np.uint8)
-            for i in range(0,len(images)):
-                output = cv2.bitwise_not(images[i],output, mask=mask[i])
-                
-            return 255-output
+                    sortMatches = sorted(rawMatches, key=lambda x: x.distance)
+                    matches = sortMatches[0:128]
 
 
-        def stackHDRs(image_files):
-            focusimages = []
-            for img in image_files:
-                print ("Reading in file {}".format(img))
-                imge = cv2.imread(f"{user_input}/{img}")
-                crop_img = imge#[y:y+h, x:x+w]
-                focusimages.append(crop_img)
-                #focusimages.append(cv2.imread("Zcombi_1902_1926/{}".format(img)))
+
+                    hom = findHomography(image_i_kp, image_1_kp, matches)
+                    newimage = cv2.warpPerspective(images[i], hom, (images[i].shape[1], images[i].shape[0]), flags=cv2.INTER_LINEAR)
+
+                    outimages.append(newimage)
+                    # If you find that there's a large amount of ghosting, it may be because one or more of the input
+                    # images gets misaligned.  Outputting the aligned images may help diagnose that.
+                    # cv2.imwrite("aligned{}.png".format(i), newimage)
+
+
+
+                return outimages
+
+            #
+            #   Compute the gradient map of the image
+            def doLap(image):
+
+                # YOU SHOULD TUNE THESE VALUES TO SUIT YOUR NEEDS
+                kernel_size = 3         # Size of the laplacian window
+                blur_size = 3           # How big of a kernal to use for the gaussian blur
+                                        # Generally, keeping these two values the same or very close works well
+                                        # Also, odd numbers, please...
+
+                blurred = cv2.GaussianBlur(image, (blur_size,blur_size), 0)
+                return cv2.Laplacian(blurred, cv2.CV_64F, ksize=kernel_size)
 
             
-            merged = focus_stack(focusimages)
-            cv2.imwrite("multi-focus-result.bmp", merged)
-            cv2.imwrite(temp1,cv2.imread(temp2))
-            cv2.imwrite(temp2, merged)
-            merged = QImage(temp2)
-            self.common(merged)
+            #   This routine finds the points of best focus in all images and produces a merged result...
+            def focus_stack(unimages):
+                images = align_images(unimages)
 
-        # global merged
-        image_files = sorted(os.listdir(user_input))
-        for img in image_files:
-            if img.split(".")[-1].lower() not in ["tif", "tiff", "png","jpg","jpeg","bmp"]:
-                image_files.remove(img)
+                print ("Computing the laplacian of the blurred images")
+                laps = []
+                for i in range(len(images)):
+                    print ("Lap {}".format(i))
+                    laps.append(doLap(cv2.cvtColor(images[i],cv2.COLOR_BGR2GRAY)))
+
+                laps = np.asarray(laps)
+                print ("Shape of array of laplacians = {}".format(laps.shape))
+
+                output = np.zeros(shape=images[0].shape, dtype=images[0].dtype)
+
+                abs_laps = np.absolute(laps)
+                maxima = abs_laps.max(axis=0)
+                bool_mask = abs_laps == maxima
+                mask = bool_mask.astype(np.uint8)
+                for i in range(0,len(images)):
+                    output = cv2.bitwise_not(images[i],output, mask=mask[i])
+                    
+                return 255-output
 
 
-        stackHDRs(image_files)
-        print ("FINISHED!!!")
+            def stackHDRs(image_files):
+                focusimages = []
+                for img in image_files:
+                    print ("Reading in file {}".format(img))
+                    imge = cv2.imread(f"{user_input}/{img}")
+                    crop_img = imge#[y:y+h, x:x+w]
+                    focusimages.append(crop_img)
+                    #focusimages.append(cv2.imread("Zcombi_1902_1926/{}".format(img)))
+
+                
+                merged = focus_stack(focusimages)
+                #cv2.imwrite("multi-focus-result.bmp", merged)
+                cv2.imwrite(temp1,cv2.imread(temp2))
+                cv2.imwrite(temp2, merged)
+                merged = QImage(temp2)
+                self.common(merged)
+
+            # global merged
+            image_files = sorted(os.listdir(user_input))
+            for img in image_files:
+                if img.split(".")[-1].lower() not in ["tif", "tiff", "png","jpg","jpeg","bmp"]:
+                    image_files.remove(img)
 
 
-    def rotate_avg(self):
+            stackHDRs(image_files)
+            print ("FINISHED!!!")
+
+
+
+    def rotate(self):
         image1 = cv2.imread(temp2)
         gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
         directory = os.path.dirname(fileName)
@@ -538,143 +772,67 @@ class QImageViewer(QMainWindow):
 
             # Prompt the user for input
         user_input = simpledialog.askstring("Input", "Enter the folder in which you want your rotated images")
-        for filename in os.listdir(directory):
-            f = os.path.join(directory, filename)
-            image2 = cv2.imread(f)
-            gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
-            wid = image2.shape[1]
-            hgt = image2.shape[0]
+        if(type(user_input)!=type(None)):
+            for filename in os.listdir(directory):
+                f = os.path.join(directory, filename)
+                image2 = cv2.imread(f)
+                gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+                wid = image2.shape[1]
+                hgt = image2.shape[0]
 
-            sift = cv2.SIFT_create(nfeatures=100)
-            keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
-            keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
+                sift = cv2.SIFT_create(nfeatures=100)
+                keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
+                keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
 
-            bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-            matches = bf.match(descriptors1, descriptors2)
-            matches = sorted(matches, key=lambda x: x.distance)
+                bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+                matches = bf.match(descriptors1, descriptors2)
+                matches = sorted(matches, key=lambda x: x.distance)
 
-            matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
-            matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
+                matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
+                matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
 
-            tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
-            sc = tform[0, 0]
-            ss = tform[0, 1]
-            scaleRecovered = np.sqrt(sc ** 2 + ss ** 2)
-            thetaRecovered = np.degrees(np.arctan2(-ss, sc))
+                tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
+                sc = tform[0, 0]
+                ss = tform[0, 1]
+                scaleRecovered = np.sqrt(sc ** 2 + ss ** 2)
+                thetaRecovered = np.degrees(np.arctan2(-ss, sc))
 
-            print('Recovered scale:', scaleRecovered)
-            print('Recovered rotation angle:', thetaRecovered)
+                print('Recovered scale:', scaleRecovered)
+                print('Recovered rotation angle:', thetaRecovered)
 
-            # Calculate the output size based on the larger image dimensions
-            outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
+                # Calculate the output size based on the larger image dimensions
+                outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
 
-            alignedImage = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
+                alignedImage = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
 
-            fig = plt.figure(figsize=(10, 7))
-            rows = 1
-            columns = 3
+                fig = plt.figure(figsize=(10, 7))
+                rows = 1
+                columns = 3
 
-         
+            
 
-            folder_path = user_input  # Specify the folder path
+                folder_path = user_input  # Specify the folder path
 
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
-                #print("Folder created successfully.")
-            # else:
-                #print("Folder already exists.")
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path)
+                    #print("Folder created successfully.")
+                # else:
+                    #print("Folder already exists.")
 
-            aligned_image_path = f'{user_input}/{i}{base_image_extension}'
-            cv2.imwrite(aligned_image_path, alignedImage)
-            i = i + 1
-            wid = alignedImage.shape[1]
-            hgt = alignedImage.shape[0]
+                aligned_image_path = f'{user_input}/{i}{base_image_extension}'
+                cv2.imwrite(aligned_image_path, alignedImage)
+                i = i + 1
+                wid = alignedImage.shape[1]
+                hgt = alignedImage.shape[0]
 
-            # displaying the dimensions
-            #print(str(wid) + "x" + str(hgt))
-            finalimages.append(alignedImage)
+                # displaying the dimensions
+                #print(str(wid) + "x" + str(hgt))
+                finalimages.append(alignedImage)
 
-        directory = user_input
+            print("Finished")
+            #finalimages.append(alignedImage)
 
-        merged_image = 0
-        i = 0
-        for filename in os.listdir(directory):
-            f = os.path.join(directory, filename)
-            i = i+1
-# for image in image_files:
-
-            image = cv2.imread(f)
-# Convert images to floating-point format
-
-# for image in finalimages:
-            image = image.astype(np.float32)/255.0
-            print(image.shape)
-            merged_image = merged_image + image
-            print(merged_image.shape)
-
-# Average the two images
-        merged_image = merged_image/i
-
-# Convert the merged image back to the uint8 format
-        merged_image = (merged_image * 255).astype(np.uint8)
-
-# Display the merged image
-            # plt.imshow(cv2.cvtColor(merged_image, cv2.COLOR_BGR2RGB))
-            # plt.axis('off')
-        cv2.imwrite('merged_sperm-specimen_average.bmp',merged_image)
-
-        cv2.imwrite(temp1,cv2.imread(temp2))
-        cv2.imwrite(temp2, merged_image)
-        merged_image = QImage(temp2)
-        self.common(merged_image)
-
-
-    def rotate(self):
-        image2 = cv2.imread(temp2)
-        gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
-        wid = image2.shape[1]
-        hgt = image2.shape[0]
-        img_folder = os.path.dirname(fileName)
-        base_image_path = img_folder+'/base.bmp'
-        image1 = cv2.imread(base_image_path)
-        gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
-        base_image_extension = os.path.splitext(base_image_path)[1]
-
-        sift = cv2.SIFT_create(nfeatures=100)
-        keypoints1, descriptors1 = sift.detectAndCompute(gray1, None)
-        keypoints2, descriptors2 = sift.detectAndCompute(gray2, None)
-
-        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-        matches = bf.match(descriptors1, descriptors2)
-        matches = sorted(matches, key=lambda x: x.distance)
-
-        matchedPts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
-        matchedPts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
-
-        tform, _ = cv2.estimateAffinePartial2D(matchedPts2, matchedPts1, method=cv2.RANSAC, confidence=0.10)
-        sc = tform[0, 0]
-        ss = tform[0, 1]
-        scaleRecovered = np.sqrt(sc * 2 + ss * 2)
-        thetaRecovered = np.degrees(np.arctan2(-ss, sc))
-
-
-            # Calculate the output size based on the larger image dimensions
-        outputSize = (max(image1.shape[1], image2.shape[1]), max(image1.shape[0], image2.shape[0]))
-
-        img = cv2.warpAffine(image2, tform, outputSize, flags=cv2.INTER_NEAREST)
-        wid = img.shape[1]
-        hgt = img.shape[0]
-
-        cv2.imwrite(temp1,cv2.imread(temp2))
-        cv2.imwrite(temp2, img)
-        img = QImage(temp2)
-        self.common(img)
-
-
-        #finalimages.append(alignedImage)
-
-    ref_point = []
-    cropping = False
+        
 
  
 
@@ -685,37 +843,38 @@ class QImageViewer(QMainWindow):
         root.withdraw()
 
             # Prompt the user for input
-        user_input = simpledialog.askstring("Input", "Enter the name of folder in which you have rotated images")    
-        merged_image = 0
-        i = 0
-        directory = user_input
-        for filename in os.listdir(directory):
-            f = os.path.join(directory, filename)
-            i = i+1
-# for image in image_files:
+        user_input = simpledialog.askstring("Input", "Enter the name of folder in which you have rotated images")   
+        if(type(user_input)!=type(None)): 
+            merged_image = 0
+            i = 0
+            directory = user_input
+            for filename in os.listdir(directory):
+                f = os.path.join(directory, filename)
+                i = i+1
+    # for image in image_files:
 
-            image = cv2.imread(f)
-# Convert images to floating-point format
+                image = cv2.imread(f)
+    # Convert images to floating-point format
 
-# for image in finalimages:
-            image = image.astype(np.float32)/255.0
-            #rint(image.shape)
-            merged_image = merged_image + image
-            #print(merged_image.shape)
-        merged_image = merged_image/i
+    # for image in finalimages:
+                image = image.astype(np.float32)/255.0
+                #rint(image.shape)
+                merged_image = merged_image + image
+                #print(merged_image.shape)
+            merged_image = merged_image/i
 
-# Convert the merged image back to the uint8 format
-        merged_image = (merged_image * 255).astype(np.uint8)
+    # Convert the merged image back to the uint8 format
+            merged_image = (merged_image * 255).astype(np.uint8)
 
-# Display the merged image
-        cv2.imwrite('merged_sperm-specimen_average.bmp',merged_image)
-        # temp1  = "temp1.jpg"
-        # temp2 = "temp2.jpg"
-            
-        #cv2.imwrite(temp1,cv2.imread(temp2))
-        cv2.imwrite(temp2, merged_image)
-        merged_image = QImage(temp2)
-        self.common(merged_image)
+    # Display the merged image
+            cv2.imwrite('merged_sperm-specimen_average.bmp',merged_image)
+            # temp1  = "temp1.jpg"
+            # temp2 = "temp2.jpg"
+                
+            #cv2.imwrite(temp1,cv2.imread(temp2))
+            cv2.imwrite(temp2, merged_image)
+            merged_image = QImage(temp2)
+            self.common(merged_image)
 
 
 
@@ -723,6 +882,7 @@ class QImageViewer(QMainWindow):
         imgsegment = self.imagesegmentAct.isChecked()
         # # Convert numpy array to OpenCV image
         image = cv2.imread(temp2)
+        messagebox.showinfo(title="Procedure", message="Select your objects with cursor and click 'c'. Then Press 'q' to to view the image segmentation and the count of cells")
         
 
         def click_and_crop(event, x, y, flags, param):
@@ -746,10 +906,12 @@ class QImageViewer(QMainWindow):
         image = cv2.imread(image_path)
         clone = image.copy()
 
-        cv2.namedWindow("Image")
+        cv2.namedWindow("Image",cv2.WINDOW_NORMAL)
+        # cv2.namedWindow('image',WINDOW_NORMAL)
+        cv2.resizeWindow('Image', 800,600)
         cv2.setMouseCallback("Image", click_and_crop)
-        print("Press c to confirm template")
-        print("Press r to reset")
+        # print("Press c to confirm template")
+        # print("Press r to reset")
         while True:
             cv2.imshow("Image", image)
             
@@ -828,7 +990,8 @@ class QImageViewer(QMainWindow):
         # cv2.destroyAllWindows()
 
         # Print the cell count
-        print(f"Number of cells detected: {count}")
+        messagebox.showinfo(title="Result", message=f"Number of objects detected is : {count}")
+        # print(f"Number of cells detected: {count}")
         cv2.imwrite(temp1,cv2.imread(temp2))
         cv2.imwrite(temp2,counted_image)
         counted_image = QImage(temp2)
@@ -850,53 +1013,54 @@ class QImageViewer(QMainWindow):
         # Open file dialog to select video
         Tk().withdraw()  # Hide the Tkinter main window
         video_path = askopenfilename(title="Select Video")  # Show the file dialog
+        if(type(video_path)!=type(None)):
+            video_capture = cv2.VideoCapture(video_path)
 
-        video_capture = cv2.VideoCapture(video_path)
+            if not video_capture.isOpened():
+                print("Error opening video file:", video_path)
+                # exit()
+            if video_capture.isOpened():
+                ret, frame = video_capture.read()
+                
+                # Prompt user to enter the value of k
+                root = Tk()
+                root.withdraw()
+                k = simpledialog.askinteger("Input", "Enter the number of objects to be tracked:")
+                if(type(k)!=type(None)):
+                    messagebox.showinfo(title="Procedure", message="Select your objects with cursor and click 'enter' after each selection. Press q to exit")
 
-        if not video_capture.isOpened():
-            print("Error opening video file:", video_path)
-            exit()
+                    for i in range(k):
+                        cv2.imshow('Frame', frame)
+                        bbi = cv2.selectROI('Frame', frame)
+                        tracker_i = TrDict['csrt']()
+                        trackers.add(tracker_i, frame, bbi)
 
-        ret, frame = video_capture.read()
-        
-        # Prompt user to enter the value of k
-        root = Tk()
-        root.withdraw()
-        k = simpledialog.askinteger("Input", "Enter the number of objects to be tracked:")
+                    while True:
+                        ret, frame = video_capture.read()
+                        if not ret:
+                            break
 
-        messagebox.showinfo(title="Procedure", message="Select your objects with cursor and click 'enter' after each selection. Press q to exit")
+                        (success, boxes) = trackers.update(frame)
+                        for i in range(k):
+                            if success:
+                                (x, y, w, h) = [int(a) for a in boxes[i]]
+                                cv2.rectangle(frame, (x, y), (x + w, y + h), (100, 205, 200), 2)
+                                cv2.rectangle(frame,(x,y),(x+w,y+h),(100,205,200),2)
+                                cv2.putText(frame, str(x+(w/2)) + ", ", (150,20+20*i), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0),2)
+                                cv2.putText(frame, str(y+(h/2)), (225,20+20*i), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0),2)
+                                cv2.putText(frame, "Coordinate of " + str(i+1) +": ", (5,20+20*i), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0),2)
 
-        for i in range(k):
-            cv2.imshow('Frame', frame)
-            bbi = cv2.selectROI('Frame', frame)
-            tracker_i = TrDict['csrt']()
-            trackers.add(tracker_i, frame, bbi)
+                        cv2.imshow('Frame', frame)
+                        key = cv2.waitKey(5) & 0xFF
+                        if key == ord('q'):
+                            break
+                            # exit()
 
-        while True:
-            ret, frame = video_capture.read()
-            if not ret:
-                break
-
-            (success, boxes) = trackers.update(frame)
-            for i in range(k):
-                if success:
-                    (x, y, w, h) = [int(a) for a in boxes[i]]
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (100, 205, 200), 2)
-                    cv2.rectangle(frame,(x,y),(x+w,y+h),(100,205,200),2)
-                    cv2.putText(frame, str(x+(w/2)) + ", ", (150,20+20*i), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0),2)
-                    cv2.putText(frame, str(y+(h/2)), (225,20+20*i), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0),2)
-                    cv2.putText(frame, "Coordinate of " + str(i+1) +": ", (5,20+20*i), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0),2)
-
-            cv2.imshow('Frame', frame)
-            key = cv2.waitKey(5) & 0xFF
-            if key == ord('q'):
-                break
-
-        video_capture.release()
-        cv2.destroyAllWindows()
+                    video_capture.release()
+                    cv2.destroyAllWindows()
 
         
     def negative(self):
@@ -1180,16 +1344,16 @@ class QImageViewer(QMainWindow):
         self.openAct = QAction("&Open...", self, shortcut="Ctrl+O", triggered=self.open)
         self.printAct = QAction("&Print...", self, shortcut="Ctrl+P", enabled=False, triggered=self.print_)
         self.exitAct = QAction("E&xit", self, shortcut="Ctrl+Q", triggered=self.close)
-        self.zoomInAct1 = QAction("Zoom &In (1%)", self, enabled=False, triggered=self.zoomIn1)
-        self.zoomOutAct1 = QAction("Zoom &Out (1%)", self, enabled=False, triggered=self.zoomOut1)
-        self.zoomInAct5 = QAction("Zoom &In (5%)", self,  enabled=False, triggered=self.zoomIn5)
-        self.zoomOutAct5 = QAction("Zoom &Out (5%)", self,  enabled=False, triggered=self.zoomOut5)
-        self.zoomInAct10 = QAction("Zoom &In (10%)", self,  enabled=False, triggered=self.zoomIn10)
-        self.zoomOutAct10 = QAction("Zoom &Out (10%)", self, enabled=False, triggered=self.zoomOut10)
-        self.zoomInAct = QAction("Zoom &In (k%)", self,  enabled=False, triggered=self.zoomIn)
-        self.zoomOutAct = QAction("Zoom &Out (k%)", self, enabled=False, triggered=self.zoomOut)
-        self.zoomInAct25 = QAction("Zoom &In (25%)", self, shortcut="Ctrl++", enabled=False, triggered=self.zoomIn25)
-        self.zoomOutAct25 = QAction("Zoom &Out (25%)", self, shortcut="Ctrl+-", enabled=False, triggered=self.zoomOut25)
+        # self.zoomInAct1 = QAction("Zoom &In (1%)", self, enabled=False, triggered=self.zoomIn1)
+        # self.zoomOutAct1 = QAction("Zoom &Out (1%)", self, enabled=False, triggered=self.zoomOut1)
+        # self.zoomInAct5 = QAction("Zoom &In (5%)", self,  enabled=False, triggered=self.zoomIn5)
+        # self.zoomOutAct5 = QAction("Zoom &Out (5%)", self,  enabled=False, triggered=self.zoomOut5)
+        # self.zoomInAct10 = QAction("Zoom &In (10%)", self,  enabled=False, triggered=self.zoomIn10)
+        # self.zoomOutAct10 = QAction("Zoom &Out (10%)", self, enabled=False, triggered=self.zoomOut10)
+        self.zoomInAct = QAction("Zoom &In", self,  enabled=False, triggered=self.zoomIn)
+        self.zoomOutAct = QAction("Zoom &Out", self, enabled=False, triggered=self.zoomOut)
+        # self.zoomInAct25 = QAction("Zoom &In (25%)", self, shortcut="Ctrl++", enabled=False, triggered=self.zoomIn25)
+        # self.zoomOutAct25 = QAction("Zoom &Out (25%)", self, shortcut="Ctrl+-", enabled=False, triggered=self.zoomOut25)
         self.normalSizeAct = QAction("&Normal Size", self, shortcut="Ctrl+S", enabled=False, triggered=self.normalSize)
         self.fitToWindowAct = QAction("&Fit to Window", self, enabled=False, checkable=True, shortcut="Ctrl+F",
                                       triggered=self.fitToWindow)
@@ -1207,9 +1371,10 @@ class QImageViewer(QMainWindow):
         self.rulerAct = QAction("&Ruler", self, enabled=False, triggered=self.ruler)
         self.smoothenAct = QAction("&Smoothen", self, enabled=False, triggered=self.smoothen)
         self.sharpenAct = QAction("&Sharpen", self, enabled=False, triggered=self.sharpen)
-        self.rotateAct = QAction("&Rotate", self, enabled=False, triggered=self.rotate)
-        self.rotateaverageAct = QAction("&Rotate Average", self, enabled=False, triggered=self.rotate_avg)
-        self.rotatemergeAct = QAction("&Rotate Merge", self, enabled=False, triggered=self.rotate_merge)
+        self.rotateAct = QAction("&Rotate Images", self, enabled = False, triggered=self.rotate)
+        # self.rotateaverageAct = QAction("&Rotate Average", self, enabled=False, triggered=self.rotate_avg)
+        # self.rotatemergeAct = QAction("&Rotate Merge", self, enabled=False, triggered=self.rotate_merge)
+        self.focusstackAct = QAction("&Focus Stack", self, triggered=self.focus_stack)
         self.imagesegmentAct = QAction("&Image segmentation", self, enabled=False, triggered=self.image_segmentation)
         self.averageAct = QAction("&Image Averaging", self, triggered=self.average)
         self.trackerAct = QAction("&Multi Object Tracking", self, triggered=self.objectTracking)
@@ -1244,11 +1409,12 @@ class QImageViewer(QMainWindow):
 
         self.rotMenu = QMenu("&Advanced IP", self)
         self.rotMenu.addAction(self.rotateAct)
-        self.rotMenu.addAction(self.rotateaverageAct)
-        self.rotMenu.addAction(self.rotatemergeAct)
+        # self.rotMenu.addAction(self.rotateaverageAct)
+        # self.rotMenu.addAction(self.rotatemergeAct)
         self.rotMenu.addAction(self.imagesegmentAct)
         self.rotMenu.addAction(self.trackerAct)
         self.rotMenu.addAction(self.averageAct)
+        self.rotMenu.addAction(self.focusstackAct)
         self.rotMenu.addSeparator()
         # self.viewMenu.addSeparator()
         # self.viewMenu.addAction(self.sharpen)
@@ -1279,14 +1445,14 @@ class QImageViewer(QMainWindow):
     def updateActions(self):
         self.zoomInAct.setEnabled(not self.fitToWindowAct.isChecked())
         self.zoomOutAct.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomInAct1.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomOutAct1.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomInAct5.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomOutAct5.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomInAct10.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomOutAct10.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomInAct25.setEnabled(not self.fitToWindowAct.isChecked())
-        self.zoomOutAct25.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomInAct1.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomOutAct1.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomInAct5.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomOutAct5.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomInAct10.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomOutAct10.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomInAct25.setEnabled(not self.fitToWindowAct.isChecked())
+        # self.zoomOutAct25.setEnabled(not self.fitToWindowAct.isChecked())
         self.normalSizeAct.setEnabled(not self.fitToWindowAct.isChecked())
 
     def scaleImage(self, factor):
